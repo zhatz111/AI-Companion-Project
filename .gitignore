@@ -101,3 +101,6 @@ target/
 *.mp4
 chromedriver
 
+# node modules
+node_modules/
+
