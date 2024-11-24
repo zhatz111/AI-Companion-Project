@@ -1,32 +1,44 @@
-// import logo from './logo.svg';
-// import './App.css';
+import React, { useState } from "react";
+import "./App.css";
+import "./components/TopBar.css";
+import "./components/Sidebar.css";
+import "./components/HomePage.css";
 
-import React from 'react';
-import HomePage from './components/HomePage';
 
 function App() {
-  return <HomePage />;
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+  const toggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen);
+  };
+
+  return (
+    <div className="App">
+      <div className="topbar">
+        <button className="menu-btn" onClick={toggleSidebar}>
+          ☰
+        </button>
+        <h1>My App</h1>
+      </div>
+      {isSidebarOpen && <div className="backdrop"></div>}
+      <div className={`sidebar ${isSidebarOpen ? "open" : ""}`}>
+        <ul className="sidebar-list">
+          <li>Home</li>
+          <li>About</li>
+          <li>Services</li>
+          <li>Contact</li>
+        </ul>
+      </div>
+      <div className={`content-wrapper ${isSidebarOpen ? "blurred" : ""}`}>
+        <div className={`content-wrapper ${isSidebarOpen ? "shifted" : ""}`}>
+          <div className="content">
+            <p>Welcome to the main content area!</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }
 
-// function App() {
-//   return (
-//     <div className="App">
-//       <header className="App-header">
-//         <img src={logo} className="App-logo" alt="logo" />
-//         <p>
-//           Edit <code>src/App.js</code> and save to reload.
-//         </p>
-//         <a
-//           className="App-link"
-//           href="https://reactjs.org"
-//           target="_blank"
-//           rel="noopener noreferrer"
-//         >
-//           Learn React
-//         </a>
-//       </header>
-//     </div>
-//   );
-// }
 
 export default App;
