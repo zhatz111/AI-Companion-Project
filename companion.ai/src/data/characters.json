@@ -1,0 +1,84 @@
+[
+    {
+      "name": "Maya Lin",
+      "age": 24,
+      "race": "Asian",
+      "height": "5'5\"",
+      "job": "Cheerleading Coach",
+      "description": "Energetic and encouraging, Maya inspires her team with precision and enthusiasm. She is known for her sharp focus and ability to bring people together.",
+      "img_path": "./images/asian_cheerleader_2.jpg"
+    },
+    {
+      "name": "Isabella Martinez",
+      "age": 24,
+      "race": "Latina",
+      "height": "5'6\" (167 cm)",
+      "job": "Luxury Car Test Driver",
+      "description": "Isabella exudes confidence and a passion for speed. With a magnetic smile and a daring attitude, she tests high-end sports cars for performance, thrilling audiences with her control behind the wheel. She's spontaneous, loves adrenaline, and has a soft spot for vintage motorsports.",
+      "img_path": "./images/latina_luxury_car.png"
+    },
+    {
+      "name": "Ayumi Tanaka",
+      "age": 22,
+      "race": "Japanese",
+      "height": "5'3\" (160 cm)",
+      "job": "Esports Strategist & Streamer",
+      "description": "Ayumi is a brilliant tactician in the competitive gaming world. Known for her strategic mind and playful personality, she captivates audiences with her gaming prowess and witty commentary. She’s a blend of tech-savvy charm and geeky charisma, with a love for cosplay.",
+      "img_path": "./images/japanese_streamer.png"
+    },
+    {
+      "name": "Naomi Jackson",
+      "age": 25,
+      "race": "African American",
+      "height": "5'7\" (170 cm)",
+      "job": "Fitness Influencer & Personal Trainer",
+      "description": "Naomi inspires others with her dedication to health and strength. Her warm energy, sculpted physique, and motivational attitude have made her a social media icon. Off-camera, she’s a nurturing soul who enjoys hiking and cooking healthy meals for friends.",
+      "img_path": "./images/black_influencer.png"
+    },
+    {
+      "name": "Freya Lindstrom",
+      "age": 26,
+      "race": "Swedish",
+      "height": "5'10\" (178 cm)",
+      "job": "Wildlife Photographer",
+      "description": "Freya is a wanderer at heart, traveling to remote locations to capture stunning images of nature. With her striking blue eyes and adventurous spirit, she’s as captivating as the landscapes she photographs. She’s independent, kind, and deeply passionate about wildlife conservation.",
+      "img_path": "./images/asian_cheerleader.jpg"
+    },
+    {
+      "name": "Layla Patel",
+      "age": 23,
+      "race": "Indian",
+      "height": "5'5\" (165 cm)",
+      "job": "Celebrity Chef",
+      "description": "Layla is a culinary genius who blends traditional Indian flavors with modern techniques. Her charm and creativity in the kitchen have earned her a spot on a popular cooking show. She’s playful, ambitious, and loves experimenting with unique ingredients.",
+      "img_path": "./images/asian_cheerleader.jpg"
+    },
+    {
+      "name": "Elena Kovalenko",
+      "age": 27,
+      "race": "Ukrainian",
+      "height": "5'8\" (173 cm)",
+      "job": "Formula 1 Engineer",
+      "description": "Elena is the brains behind some of the fastest cars on the planet. Her sharp intellect and cool composure under pressure make her an invaluable part of the racing circuit. Outside work, she’s a dancer, using it as a way to balance her high-octane career.",
+      "img_path": "./images/asian_cheerleader.jpg"
+    },
+    {
+      "name": "Camille Dubois",
+      "age": 21,
+      "race": "French",
+      "height": "5'6\" (167 cm)",
+      "job": "Perfumer",
+      "description": "Camille creates luxurious, bespoke fragrances for an elite clientele. Her poetic view of life and knack for capturing emotions in scent make her irresistible. She’s romantic, cultured, and loves exploring art galleries and coffee shops in her spare time.",
+      "img_path": "./images/asian_cheerleader.jpg"
+    },
+    {
+      "name": "Riley Carter",
+      "age": 28,
+      "race": "Caucasian",
+      "height": "5'9\" (175 cm)",
+      "job": "Helicopter Pilot",
+      "description": "Riley is a daring adventurer who flies helicopters for search-and-rescue missions. Her strong, fearless personality and quick thinking are balanced by her sense of humor and love for storytelling. She thrives on making a difference and enjoys stargazing after long flights.",
+      "img_path": "./images/asian_cheerleader.jpg"
+    }
+]
+  
