@@ -1,6 +1,7 @@
 import React from 'react'
 import HamburgerMenu from './HamburgerMenu'
 import Button from './Button'
+import MdMenuOpen from "react-icons/md";
 
 const TopBar = ({ isOpen, setOpen }) => {
   return (
@@ -10,7 +11,8 @@ const TopBar = ({ isOpen, setOpen }) => {
             <div className="mx-auto px-2 sm:px-6 lg:px-8">
                 <div className="flex h-16 items-center justify-between">
                 <div className="flex flex-1 items-center justify-center">
-                    <HamburgerMenu isOpen={isOpen} setOpen={setOpen} />
+                    {/* <MdMenuOpen size={34} className={`text-[#FF6FCF] duration-500 cursor-pointer ${!isOpen && ' rotate-180'}`} onClick={() => setOpen(!isOpen)} /> */}
+                    {/* <HamburgerMenu isOpen={isOpen} setOpen={setOpen} /> */}
                     <a className="flex flex-shrink-0 items-center mr-1 px-1" href="/index.html">
                     <span className="text-white text-xl mm:text-2xl sm:text-3xl font-bold">Sweet</span>
                     <span className="text-[#FF6FCF] text-xl mm:text-2xl sm:text-3xl font-bold">Aura</span>

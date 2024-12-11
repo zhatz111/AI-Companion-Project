@@ -10,7 +10,7 @@ import ChatMessages from "./components/ChatMessages";
 import ChatInput from "./components/ChatInput";
 
 // Photos for website
-import groupWomenCrop from "./assets/ai_models/group_women_4_crop.png"
+import groupWomenCrop from "../public/images/c_banner.jpg"
 
 const App = () => {
   const [isOpen, setOpen] = useState(false);
@@ -42,9 +42,9 @@ const App = () => {
   };
 
   return (
-    <div className='bg-[#212121]'>
-      {/* <TopBar isOpen={isOpen} setOpen={setOpen} /> */}
-      <SmallSidebarButton toggleSidebar={toggleSidebar} />
+    <div className='flex min-h-screen bg-[#212121]'>
+      <TopBar isOpen={isOpen} setOpen={setOpen} />
+      {/* <SmallSidebarButton toggleSidebar={toggleSidebar} /> */}
       <Sidebar isOpen={isOpen} toggleSidebar={toggleSidebar} />
       {/* <SmallSidebar isOpen={isOpen} /> */}
       <div className={`flex flex-col min-h-screen bg-[#212121] py-4 sm:py-20 sm:ml-28 transition-all duration-300 ease-in-out ${isOpen ? "sm:pl-28" : "sm:pl-0"}`}>

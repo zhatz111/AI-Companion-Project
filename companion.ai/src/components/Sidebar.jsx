@@ -58,13 +58,8 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
     //     </aside>
     // </div>
 
-    <nav className={`shadow-md h-screen p-2 flex flex-col duration-500 bg-blue-600 text-white ${isOpen ? 'w-60' : 'w-16'}`}>
+    <nav className={`shadow-md h-screen p-2 flex flex-col duration-500 bg-[#121212] text-white ${isOpen ? 'w-60' : 'w-16'}`}>
 
-        {/* Header */}
-        <div className=' px-3 py-2 h-20 flex justify-between items-center'>
-        {/* <img src={logo} alt="Logo" className={`${isOpen ? 'w-10' : 'w-0'} rounded-md`} /> */}
-        <div><MdMenuOpen size={34} className={` duration-500 cursor-pointer ${!isOpen && ' rotate-180'}`} onClick={toggleSidebar} /></div>
-        </div>
 
         {/* Body */}
 
@@ -72,7 +67,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
         {
             menuItems.map((item, index) => {
             return (
-                <li key={index} className='px-3 py-2 my-2 hover:bg-blue-800 rounded-md duration-300 cursor-pointer flex gap-2 items-center relative group'>
+                <li key={index} className='px-2 py-2 my-2 hover:bg-[#FF6FCF] rounded-md duration-300 cursor-pointer flex gap-2 items-center relative group'>
                 <div>{item.icons}</div>
                 <p className={`${!isOpen && 'w-0 translate-x-24'} duration-500 overflow-hidden`}>{item.label}</p>
                 <p className={`${isOpen && 'hidden'} absolute left-32 shadow-md rounded-md
