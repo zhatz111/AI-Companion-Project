@@ -1,16 +1,22 @@
-import React from 'react'
+import React from 'react';
+import { Link } from 'react-router-dom';
 
-const Button = ({ href, label, classes }) => {
+const Button = ({ to, label, onClick, classes }) => {
   return (
     <div>
-        <a
-            href={href}
-            className={`text-[#FF6FCF] text-sm sm:text-lg hover:bg-[#FF6FCF] hover:text-white border-solid border border-[#FF6FCF] rounded-full px-2 py-1 ${classes}`}
-        >
-            {label}
-        </a>
+      <Link
+        to={to || "#"} // Fallback to "#" if no `to` prop is provided
+        onClick={(e) => {
+          if (onClick) {
+            onClick(e); // Execute the onClick function
+          }
+        }}
+        className={`text-[#FF6FCF] text-sm sm:text-lg hover:bg-[#FF6FCF] hover:text-white border-solid border border-[#FF6FCF] rounded-xl px-2 py-1 ${classes}`}
+      >
+        {label}
+      </Link>
     </div>
-  )
-}
+  );
+};
 
-export default Button
+export default Button;
