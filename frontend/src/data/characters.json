@@ -1,5 +1,5 @@
 [
-    {
+  {
       "name": "Maya Lin",
       "age": 24,
       "race": "Asian",
@@ -7,9 +7,13 @@
       "job": "Cheerleading Coach",
       "description": "Energetic and encouraging, Maya inspires her team with precision and enthusiasm. She is known for her sharp focus and ability to bring people together.",
       "img_path": "./images/asian_cheerleader_2.jpg",
-      "alt_img_path": "./images/c1.jpg"
-    },
-    {
+      "alt_img_path": "./images/c1.jpg",
+      "body_type": "Athletic",
+      "relationship": "Single",
+      "hobbies": ["Cheerleading", "Yoga", "Team Building Activities"],
+      "personality": ["Energetic", "Encouraging", "Focused"]
+  },
+  {
       "name": "Isabella Martinez",
       "age": 24,
       "race": "Latina",
@@ -17,9 +21,13 @@
       "job": "Luxury Car Test Driver",
       "description": "Isabella exudes confidence and a passion for speed. With a magnetic smile and a daring attitude, she tests high-end sports cars for performance, thrilling audiences with her control behind the wheel. She's spontaneous, loves adrenaline, and has a soft spot for vintage motorsports.",
       "img_path": "./images/latina_luxury_car.png",
-      "alt_img_path": "./images/c2.jpg"
-    },
-    {
+      "alt_img_path": "./images/c2.jpg",
+      "body_type": "Slim",
+      "relationship": "In a relationship",
+      "hobbies": ["Driving", "Motorsports", "Exploring New Roads"],
+      "personality": ["Confident", "Spontaneous", "Daring"]
+  },
+  {
       "name": "Ayumi Tanaka",
       "age": 22,
       "race": "Japanese",
@@ -27,9 +35,13 @@
       "job": "Esports Strategist & Streamer",
       "description": "Ayumi is a brilliant tactician in the competitive gaming world. Known for her strategic mind and playful personality, she captivates audiences with her gaming prowess and witty commentary. She’s a blend of tech-savvy charm and geeky charisma, with a love for cosplay.",
       "img_path": "./images/japanese_streamer.png",
-      "alt_img_path": "./images/c3.jpg"
-    },
-    {
+      "alt_img_path": "./images/c3.jpg",
+      "body_type": "Petite",
+      "relationship": "Single",
+      "hobbies": ["Gaming", "Cosplay", "Tech Gadgets"],
+      "personality": ["Strategic", "Playful", "Tech-Savvy"]
+  },
+  {
       "name": "Naomi Jackson",
       "age": 25,
       "race": "African American",
@@ -37,9 +49,13 @@
       "job": "Fitness Influencer & Personal Trainer",
       "description": "Naomi inspires others with her dedication to health and strength. Her warm energy, sculpted physique, and motivational attitude have made her a social media icon. Off-camera, she’s a nurturing soul who enjoys hiking and cooking healthy meals for friends.",
       "img_path": "./images/black_influencer.png",
-      "alt_img_path": "./images/c4.jpg"
-    },
-    {
+      "alt_img_path": "./images/c4.jpg",
+      "body_type": "Athletic",
+      "relationship": "Married",
+      "hobbies": ["Hiking", "Cooking", "Strength Training"],
+      "personality": ["Motivational", "Warm", "Dedicated"]
+  },
+  {
       "name": "Freya Lindstrom",
       "age": 26,
       "race": "Swedish",
@@ -47,9 +63,13 @@
       "job": "Wildlife Photographer",
       "description": "Freya is a wanderer at heart, traveling to remote locations to capture stunning images of nature. With her striking blue eyes and adventurous spirit, she’s as captivating as the landscapes she photographs. She’s independent, kind, and deeply passionate about wildlife conservation.",
       "img_path": "./images/asian_cheerleader.jpg",
-      "alt_img_path": "./images/c5.jpg"
-    },
-    {
+      "alt_img_path": "./images/c5.jpg",
+      "body_type": "Lean",
+      "relationship": "Single",
+      "hobbies": ["Photography", "Traveling", "Wildlife Conservation"],
+      "personality": ["Adventurous", "Kind", "Independent"]
+  },
+  {
       "name": "Layla Patel",
       "age": 23,
       "race": "Indian",
@@ -57,9 +77,13 @@
       "job": "Celebrity Chef",
       "description": "Layla is a culinary genius who blends traditional Indian flavors with modern techniques. Her charm and creativity in the kitchen have earned her a spot on a popular cooking show. She’s playful, ambitious, and loves experimenting with unique ingredients.",
       "img_path": "./images/asian_cheerleader.jpg",
-      "alt_img_path": "./images/c6.jpg"
-    },
-    {
+      "alt_img_path": "./images/c6.jpg",
+      "body_type": "Curvy",
+      "relationship": "In a relationship",
+      "hobbies": ["Cooking", "Experimenting with Recipes", "Hosting Dinner Parties"],
+      "personality": ["Ambitious", "Creative", "Playful"]
+  },
+  {
       "name": "Elena Kovalenko",
       "age": 27,
       "race": "Ukrainian",
@@ -67,9 +91,13 @@
       "job": "Formula 1 Engineer",
       "description": "Elena is the brains behind some of the fastest cars on the planet. Her sharp intellect and cool composure under pressure make her an invaluable part of the racing circuit. Outside work, she’s a dancer, using it as a way to balance her high-octane career.",
       "img_path": "./images/asian_cheerleader.jpg",
-      "alt_img_path": "./images/c7.jpg"
-    },
-    {
+      "alt_img_path": "./images/c7.jpg",
+      "body_type": "Slim",
+      "relationship": "Engaged",
+      "hobbies": ["Dancing", "Engineering Projects", "Formula 1"],
+      "personality": ["Intelligent", "Composed", "Innovative"]
+  },
+  {
       "name": "Camille Dubois",
       "age": 21,
       "race": "French",
@@ -77,9 +105,13 @@
       "job": "Perfumer",
       "description": "Camille creates luxurious, bespoke fragrances for an elite clientele. Her poetic view of life and knack for capturing emotions in scent make her irresistible. She’s romantic, cultured, and loves exploring art galleries and coffee shops in her spare time.",
       "img_path": "./images/asian_cheerleader.jpg",
-      "alt_img_path": "./images/c8.jpg"
-    },
-    {
+      "alt_img_path": "./images/c8.jpg",
+      "body_type": "Petite",
+      "relationship": "Single",
+      "hobbies": ["Exploring Art Galleries", "Creating Scents", "Visiting Coffee Shops"],
+      "personality": ["Romantic", "Cultured", "Creative"]
+  },
+  {
       "name": "Riley Carter",
       "age": 28,
       "race": "Caucasian",
@@ -87,7 +119,10 @@
       "job": "Helicopter Pilot",
       "description": "Riley is a daring adventurer who flies helicopters for search-and-rescue missions. Her strong, fearless personality and quick thinking are balanced by her sense of humor and love for storytelling. She thrives on making a difference and enjoys stargazing after long flights.",
       "img_path": "./images/asian_cheerleader.jpg",
-      "alt_img_path": "./images/c8.jpg"
-    }
+      "alt_img_path": "./images/c8.jpg",
+      "body_type": "Athletic",
+      "relationship": "Married",
+      "hobbies": ["Flying", "Storytelling", "Stargazing"],
+      "personality": ["Fearless", "Quick-Thinking", "Humorous"]
+  }
 ]
-  

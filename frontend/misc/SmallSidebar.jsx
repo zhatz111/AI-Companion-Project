@@ -1,5 +1,5 @@
 import React from 'react'
-import items from "../data/sidebar_items.json"
+import items from "../src/data/sidebar_items.json"
 import SmallSidebarItem from './SmallSidebarItem'
 
 const SmallSidebar = ({ isOpen }) => {

@@ -13,32 +13,22 @@ import ChatPage from './pages/ChatPage';
 const App = () => {
   return (
     <Router>
-      <Routes>
-        <Route
-          path="/"
-          element={
-            <MainLayout>
-              <HomePage />
-            </MainLayout>
-          }
-        />
-        <Route
-          path="/chat"
-          element={
-            <MainLayout>
-              <ChatPage />
-            </MainLayout>
-          }
-        />
-        {/* <Route
-          path="/contact"
-          element={
-            <MainLayout>
-              <ContactPage />
-            </MainLayout>
-          }
-        /> */}
-      </Routes>
+      <MainLayout>
+        <Routes>
+          <Route
+            path="/"
+            element={ <HomePage /> }
+          />
+          <Route
+            path="/chat"
+            element={ <ChatPage /> }
+          />
+          {/* <Route
+            path="/contact"
+            element={ <ContactPage /> }
+          /> */}
+        </Routes>
+      </MainLayout>
     </Router>
 
     // <div className='flex min-h-screen bg-[#212121]'>

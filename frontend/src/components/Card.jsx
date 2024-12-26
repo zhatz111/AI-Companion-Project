@@ -6,10 +6,10 @@ const Card = ({ item }) => {
   return (
     <div className="w-full bg-[#212121] rounded-xl shadow-lg relative">
         <figure className="relative max-w-sm group">
-            <a href="#">
+            <Link to="/chat" state={ item }>
               <img className="w-full h-78 mm:h-64 sm:h-128 object-cover rounded-lg shadow-lg transition-all cursor-pointer filter bg-opacity-30 brightness-[50%] duration-500 group-hover:filter-none" src={item.alt_img_path} alt=""></img>
-            </a>
-            <Link to= "/chat" className='absolute top-3 right-3 border-2 sm:border-3 rounded-full border-[#FF6FCF] transition hover:bg-[#FF6FCF] py-2 px-2 group/message' href={`/${item.id}`}>
+            </Link>
+            <Link to="/chat" state={ item } className='absolute top-3 right-3 border-2 sm:border-3 rounded-full border-[#FF6FCF] transition hover:bg-[#FF6FCF] py-2 px-2 group/message'>
               <svg className="h-3 w-3 sm:h-5 sm:w-5 flex-no-shrink stroke-[#FF6FCF] transition duration-100 group-hover/message:stroke-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
             </Link>
             <figcaption className="absolute left-6 right-6 bottom-6 grid gap-2">

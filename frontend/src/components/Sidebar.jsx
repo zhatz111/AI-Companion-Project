@@ -55,7 +55,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
           <div>{item.icons}</div>
           <p
             className={`${
-              !isOpen && 'w-0 translate-x-24'
+              !isOpen && 'translate-x-8'
             } duration-500 overflow-hidden`}
           >
             {item.label}
@@ -64,7 +64,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
             className={`${
               isOpen && 'hidden'
             } absolute shadow-md rounded-md
-              w-0 p-0 text-black bg-white duration-100 overflow-hidden group-hover:w-fit group-hover:p-2 group-hover:left-16`}
+              w-0 p-0 text-black bg-white overflow-hidden group-hover:w-fit group-hover:p-2 group-hover:left-16`}
           >
             {item.label}
           </p>
@@ -78,7 +78,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
       </div>
       <div
         className={`leading-5 ${
-          !isOpen && 'w-0 translate-x-24'
+          !isOpen && 'translate-x-8'
         } duration-500 overflow-hidden`}
       >
         <p>Saheb</p>
