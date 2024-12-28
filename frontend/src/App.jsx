@@ -23,25 +23,9 @@ const App = () => {
             path="/chat"
             element={ <ChatPage /> }
           />
-          {/* <Route
-            path="/contact"
-            element={ <ContactPage /> }
-          /> */}
         </Routes>
       </MainLayout>
     </Router>
-
-    // <div className='flex min-h-screen bg-[#212121]'>
-    //   <TopBar isOpen={isOpen} setOpen={setOpen} onLoginClick={handleToggleLogin} />
-    //   <Sidebar isOpen={isOpen} toggleSidebar={toggleSidebar} />
-    //   <Login isVisible={isLoginVisible} onClose={handleToggleLogin} />
-      // <div className={`flex flex-col min-h-screen bg-[#212121] py-4 sm:py-20 sm:ml-4 transition-all duration-300 ease-in-out`}>
-      //   <Hero image={groupWomenCrop}/>
-      //   <section className="bg-[#212121] w-full">
-      //     <CharacterCards/>
-      //   </section>
-      // </div>
-    // </div>
   )
 }
 

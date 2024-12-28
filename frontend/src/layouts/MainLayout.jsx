@@ -16,7 +16,7 @@ const MainLayout = ({ children }) => {
     const handleToggleCreate = () => setCreateVisible(!isCreateVisible);
 
     return (
-    <div className="flex min-h-screen bg-[#212121]">
+    <div className="flex overflow-y-auto scrollbar bg-[#212121]">
         {/* Top Bar */}
         <TopBar
         isOpen={isOpen}
@@ -28,6 +28,7 @@ const MainLayout = ({ children }) => {
         {/* Login Modal */}
         <Login isVisible={isLoginVisible} onClose={handleToggleLogin} />
         <CreateAccount isVisible={isCreateVisible} onClose={handleToggleCreate} />
+
         <div className="flex-1 overflow-y-auto">
             {/* Sidebar */}
             <Sidebar isOpen={isOpen} toggleSidebar={toggleSidebar} />

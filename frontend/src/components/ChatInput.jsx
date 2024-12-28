@@ -1,8 +1,10 @@
 import React from 'react'
 import { useState, useEffect } from 'react'
+import { FaArrowUpLong } from "react-icons/fa6";
 
-const ChatInput = ({ onSendMessage }) => {
+const ChatInput = ({ item, onSendMessage }) => {
     const [text, setText] = useState("");
+    const firstName = item.name.split(" ")[0]
 
     const handleSubmit = (e) => {
       e.preventDefault();
@@ -29,30 +31,25 @@ const ChatInput = ({ onSendMessage }) => {
         <label htmlFor="chat" className="sr-only">
             Your message
         </label>
-        <div className="flex items-center px-3 py-2 rounded-md bg-[#303030]">
+        <div className="flex justify-center pl-8 relative">
+          <div className="relative w-5/6">
             <textarea
-            id="chat"
-            rows="1"
-            wrap="soft"
-            className="block resize-none rounded-md mx-4 p-2.5 w-full text-sm bg-[#121212] border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500"
-            placeholder="Your message..."
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            onKeyDown={handleKeyDown}
+              id="chat"
+              rows="1"
+              wrap="soft"
+              className="block resize-none rounded-lg outline-none p-4 w-full text-md bg-[#303030] text-white pr-12" // Add padding-right to avoid overlap
+              placeholder={`Message ${firstName}`}
+              value={text}
+              onChange={(e) => setText(e.target.value)}
+              onKeyDown={handleKeyDown}
             ></textarea>
             <button
-            type="submit"
-            className="inline-flex justify-center p-2 text-[#FF6FCF] rounded-full cursor-pointer hover:text-white hover:bg-[#FF6FCF]"
+              type="submit"
+              className="absolute top-1/2 right-3 transform -translate-y-1/2 p-3 text-[#FF6FCF] rounded-full cursor-pointer hover:bg-gray-300 bg-gray-100"
             >
-            <svg
-                className="w-5 h-5 rotate-90 rtl:-rotate-90"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="currentColor"
-                viewBox="0 0 18 20"
-            >
-                <path d="m17.914 18.594-8-18a1 1 0 0 0-1.828 0l-8 18a1 1 0 0 0 1.157 1.376L8 18.281V9a1 1 0 0 1 2 0v9.281l6.758 1.689a1 1 0 0 0 1.156-1.376Z" />
-            </svg>
+              <FaArrowUpLong />
             </button>
+          </div>
         </div>
     </form>
   )

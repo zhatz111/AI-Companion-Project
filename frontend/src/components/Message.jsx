@@ -4,7 +4,7 @@ const Message = ({ item, text, time, sender }) => {
   const isSender = sender === "sender";
   if (isSender) {
     return (
-      <div className="flex w-full mt-2 space-x-3 max-w-xs ml-auto justify-end">
+      <div className="flex w-full mt-2 space-x-3 sm:max-w-xs md:max-w-md ml-auto justify-end">
         <div>
           <div className="bg-[#303030] text-white p-3 rounded-l-lg rounded-br-lg">
             <p className="text-md">{text}</p>
@@ -18,7 +18,7 @@ const Message = ({ item, text, time, sender }) => {
     );
   } else {
     return (
-      <div className="flex w-full mt-2 space-x-3 max-w-xs">
+      <div className="flex w-full mt-2 space-x-3 max-w-md">
         <div className="flex-shrink-0 h-12 w-12 rounded-full overflow-hidden bg-gray-300">
           <img src={item.alt_img_path} alt="Receiver's Avatar" />
         </div>

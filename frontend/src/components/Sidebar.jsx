@@ -41,7 +41,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
 
   return (
     <nav
-    className={`fixed top-0 left-0 shadow-md border-r border-[#FF6FCF] pt-20 bottom-0 z-40 p-6 flex flex-col duration-500 ease-in-out bg-[#121212] text-white h-screen ${
+    className={`fixed top-0 left-0 shadow-md border-r border-[#FF6FCF] pt-20 bottom-0 z-40 p-6 flex flex-col transition-width duration-500 ease-in-out bg-[#121212] text-white ${
       isOpen ? 'w-60' : 'w-24'
     }`}
   >

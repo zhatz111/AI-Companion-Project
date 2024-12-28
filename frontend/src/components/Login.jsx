@@ -17,7 +17,7 @@ const Login = ({ isVisible, onClose }) => {
             onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside
         >
             <a
-            href="#"
+            href="/"
             className="flex items-center mb-6 text-2xl font-semibold text-white"
             >
             {/* <img
