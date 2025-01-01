@@ -1,10 +1,38 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { MdEmail } from "react-icons/md";
 import { RiLockPasswordLine } from "react-icons/ri";
 import { MdPermIdentity } from "react-icons/md";
+import { AuthContext } from '../api/AuthContext';
 
-const CreateAccount = ({ isVisible, onClose }) => {
+function timeout(delay) {
+    return new Promise( res => setTimeout(res, delay) );
+}
+
+const CreateAccount = ({ isVisible, onClose, onLogin }) => {
     if (!isVisible) return null; // Do not render if not visible
+
+    const { register } = useContext(AuthContext);
+
+    const [formData, setFormData] = useState({ username: "", email: "", password: "" });
+    const [message, setMessage] = useState("");
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData({ ...formData, [name]: value });
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            const response = await register(formData.username, formData.email, formData.password);
+            setMessage("Account Succesfully Created!");
+            setFormData({ username: "", email: "", password: "" })
+            await timeout(500);
+            onLogin();
+        } catch (error) {
+            setMessage("Error: " + error.response?.data?.detail || "Something went wrong.");
+        }
+    };
 
   return (
     <div>
@@ -20,69 +48,46 @@ const CreateAccount = ({ isVisible, onClose }) => {
             href="#"
             className="flex items-center mb-6 text-2xl font-semibold text-white"
             >
-            {/* <img
-                className="w-8 h-8 mr-2"
-                src="https://flowbite.s3.amazonaws.com/blocks/marketing-ui/logo.svg"
-                alt="logo"
-            /> */}
             Create Account
             </a>
-            <form className="space-y-4 md:space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-4 md:space-y-6">
             <div>
-                {/* <label
-                htmlFor="email"
-                className="block mb-2 text-sm font-medium text-gray-900 text-white"
-                >
-                Email
-                </label> */}
                 <MdPermIdentity size="20" className='absolute text-gray-400 mt-3 ml-3'/>
                 <input
-                type="name"
-                id="name"
-                className="rounded-md pl-10 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Name"
+                type="text"
+                name="username"
+                placeholder="Username"
+                value={formData.username}
+                onChange={handleChange}
                 required
+                className="rounded-md pl-10 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500"
                 />
             </div>
             <div>
-                {/* <label
-                htmlFor="email"
-                className="block mb-2 text-sm font-medium text-gray-900 text-white"
-                >
-                Email
-                </label> */}
                 <MdEmail size="20" className='absolute text-gray-400 mt-3 ml-3'/>
                 <input
                 type="email"
-                id="email"
-                className="rounded-md pl-10 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500"
-                placeholder="E-mail"
+                name="email"
+                placeholder="Email"
+                value={formData.email}
+                onChange={handleChange}
                 required
+                className="rounded-md pl-10 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500"
                 />
             </div>
             <div>
-                {/* <label
-                htmlFor="password"
-                className="block mb-2 text-sm font-medium text-gray-900 text-white"
-                >
-                Password
-                </label> */}
                 <RiLockPasswordLine size="20" className='absolute text-gray-400 mt-3 ml-3' />
                 <input
                 type="password"
-                id="password"
+                name="password"
                 placeholder="Password"
-                className="rounded-md pl-10 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500"
+                value={formData.password}
+                onChange={handleChange}
                 required
+                className="rounded-md pl-10 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500"
                 />
             </div>
-            <div>
-                {/* <label
-                htmlFor="password"
-                className="block mb-2 text-sm font-medium text-gray-900 text-white"
-                >
-                Password
-                </label> */}
+            {/* <div>
                 <RiLockPasswordLine size="20" className='absolute text-gray-400 mt-3 ml-3' />
                 <input
                 type="confirm password"
@@ -91,7 +96,8 @@ const CreateAccount = ({ isVisible, onClose }) => {
                 className="rounded-md pl-10 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500"
                 required
                 />
-            </div>
+            </div> */}
+
             <p className="text-sm font-light text-gray-400">
             Minimum of 6 Characters
             </p>
@@ -101,14 +107,26 @@ const CreateAccount = ({ isVisible, onClose }) => {
             >
                 Create Account
             </button>
+            {message && <p className="mt-4 text-white text-sm">{message}</p>}
+            <p className="text-sm font-light text-gray-400">
+                Already have an account? {' '}
+                <button
+                    type="button"
+                    onClick={onLogin}
+                    className="font-medium text-white hover:underline"
+                >
+                    Login
+                </button>
+            </p>
             <p className="text-sm font-light text-gray-400">
                 By signing up, you agree to {' '}
-                <a
-                href="#"
-                className="font-medium text-white underline"
+                <button
+                    type="button"
+                    onClick={onLogin}
+                    className="font-medium text-white hover:underline"
                 >
-                Terms of Service
-                </a>
+                    Terms of Service
+                </button>
             </p>
             </form>
         </div>

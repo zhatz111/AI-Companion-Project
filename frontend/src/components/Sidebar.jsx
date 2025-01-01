@@ -1,43 +1,84 @@
-import React, { useState, useEffect } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import SidebarItem from './SidebarItem'
-import items from "../data/sidebar_items.json"
-// icons
-import { MdMenuOpen } from "react-icons/md";
-import { IoHomeOutline } from "react-icons/io5";
-import { FaProductHunt } from "react-icons/fa";
-import { FaUserCircle } from "react-icons/fa";
-import { TbReportSearch } from "react-icons/tb";
-import { IoLogoBuffer } from "react-icons/io";
-import { CiSettings } from "react-icons/ci";
-import { MdOutlineDashboard } from "react-icons/md";
+import { AuthContext } from "../api/AuthContext";
+import getUserData from "../api/getUserData";
 
-const Sidebar = ({ isOpen, toggleSidebar }) => {
+// icons
+import { IoHomeOutline } from "react-icons/io5";
+import { FaUserCircle } from "react-icons/fa";
+import { CiSettings } from "react-icons/ci";
+import { MdLogout } from "react-icons/md";
+import { IoFemale } from "react-icons/io5";
+import { IoMale } from "react-icons/io5";
+import { IoCreateOutline } from "react-icons/io5";
+import { GiFlowerTwirl } from "react-icons/gi";
+import { FaPerson } from "react-icons/fa6";
+import { FaPhoneSquareAlt } from "react-icons/fa";
+
+const Sidebar = ({ isOpen, onLoginClick }) => {
+    const { logout } = useContext(AuthContext);
+    const storedToken = localStorage.getItem("token");
+    console.log(storedToken)
+    const [userData, setUserData] = useState(null);
+
     const menuItems = [
         {
           icons: <IoHomeOutline size={30} />,
           label: 'Home'
         },
         {
-          icons: <FaProductHunt size={30} />,
-          label: 'Products'
+          icons: <IoFemale size={30} />,
+          label: 'Cats'
         },
         {
-          icons: <MdOutlineDashboard size={30} />,
-          label: 'Dashboard'
+          icons: <IoMale size={30} />,
+          label: 'Dogs'
         },
+        {
+          icons: <GiFlowerTwirl size={30} />,
+          label: 'Anime'
+        },
+        // {
+        //   icons: <IoCreateOutline size={30} />,
+        //   label: 'Create'
+        // },
+        // {
+        //   icons: <FaPerson size={30} />,
+        //   label: 'My Character'
+        // },
         {
           icons: <CiSettings size={30} />,
-          label: 'Setting'
+          label: 'Settings'
         },
         {
-          icons: <IoLogoBuffer size={30} />,
-          label: 'Log'
-        },
-        {
-          icons: <TbReportSearch size={30} />,
-          label: 'Report'
+          icons: <FaPhoneSquareAlt size={30} />,
+          label: 'Contact us'
         }
       ]
+    
+    const logoutButton = {
+      icons: <MdLogout size={30} />,
+      label: 'Logout'
+    }
+
+    useEffect(() => {
+      const fetchData = async () => {
+        try {
+          if (storedToken) {
+            const data = await getUserData(storedToken);
+            setUserData(data);
+          } else {
+            setUserData(null); // Clear user data if no token
+          }
+        } catch (error) {
+          console.error("Failed to fetch user data.");
+        }
+      };
+  
+      fetchData();
+    }, [storedToken]);
+
+    
 
   return (
     <nav
@@ -45,44 +86,45 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
       isOpen ? 'w-60' : 'w-24'
     }`}
   >
+
     {/* Body */}
     <ul className="flex-1">
       {menuItems.map((item, index) => (
-        <li
-          key={index}
-          className="px-2 py-2 my-2 hover:bg-[#FF6FCF] rounded-md duration-300 cursor-pointer flex gap-2 items-center relative group"
-        >
-          <div>{item.icons}</div>
-          <p
-            className={`${
-              !isOpen && 'translate-x-8'
-            } duration-500 overflow-hidden`}
-          >
-            {item.label}
-          </p>
-          <p
-            className={`${
-              isOpen && 'hidden'
-            } absolute shadow-md rounded-md
-              w-0 p-0 text-black bg-white overflow-hidden group-hover:w-fit group-hover:p-2 group-hover:left-16`}
-          >
-            {item.label}
-          </p>
-        </li>
+        <div key={index} className="cursor-pointer">
+          <SidebarItem isOpen={isOpen} item={item} />
+        </div>
       ))}
+      {userData ? (
+        <div onClick={logout} className="cursor-pointer">
+          <SidebarItem isOpen={isOpen} item={logoutButton} />
+        </div>
+      ) : (
+        <></>
+      )}
     </ul>
+
+
     {/* Footer */}
-    <div className="flex items-center gap-2 px-3 py-2">
+    <div className="flex cursor-pointer hover:underline items-center gap-2 px-3 py-2">
       <div>
         <FaUserCircle size={30} />
       </div>
       <div
-        className={`leading-5 ${
-          !isOpen && 'translate-x-8'
-        } duration-500 overflow-hidden`}
-      >
-        <p>Saheb</p>
-        <span className="text-xs">saheb@gmail.com</span>
+        className={`${!isOpen && 'translate-x-8'} duration-500 overflow-hidden`}>
+        {userData ? (
+          <>
+            <p className="px-2">{userData.username}</p>
+            <span className="text-xs">
+              <p className="px-2">{userData.email}</p>
+            </span>
+          </>
+        ) : (
+          <>
+            <button onClick={onLoginClick} className="hover:underline px-2">
+              Login
+            </button>
+          </>
+        )}
       </div>
     </div>
   </nav>

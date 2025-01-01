@@ -1,24 +1,24 @@
 import React from 'react'
 
-const SidebarItem = ({ item }) => {
+const SidebarItem = ({ isOpen, item, route }) => {
 
   return (
-    <div>
-        <li>
-        <a
-            href={`/${item.id}`}
-            className="flex items-center bg-[#212121] p-2 text-white rounded-lg border-solid border-2 border-gray-500 hover:bg-[#121212] group"
+    <>
+        <li
+          className="px-2 py-2 my-2 hover:bg-[#FF6FCF] whitespace-nowrap rounded-xl duration-300 cursor-pointer flex gap-4 items-center group"
         >
-            {/* {icons[icon]} */}
-            <svg className="w-5 h-5 text-white transition duration-75 group-hover:text-[#FF6FCF]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox={item.viewbox}>
-                {item.path.map((d_path, index) => (
-                    <path key={index} d={d_path} />
-                ))}
-            </svg>
-            <span className="ms-3">{item.name}</span>
-        </a>
+            <div>{item.icons}</div>
+            <p
+            className={`${!isOpen && 'translate-x-8'} duration-500 overflow-hidden`}>
+                {item.label}
+            </p>
+
+            <p
+            className={`${isOpen && 'hidden'} absolute shadow-md rounded-md w-0 p-0 text-black bg-white overflow-hidden group-hover:w-fit group-hover:p-2 group-hover:left-20`}>
+                {item.label}
+            </p>
         </li>
-    </div>
+    </>
   )
 }
 

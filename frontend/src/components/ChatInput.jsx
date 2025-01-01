@@ -1,10 +1,12 @@
 import React from 'react'
 import { useState, useEffect } from 'react'
 import { FaArrowUpLong } from "react-icons/fa6";
+import { AuthContext } from "../api/AuthContext";
 
-const ChatInput = ({ item, onSendMessage }) => {
+const ChatInput = ({ item, onSendMessage, user }) => {
     const [text, setText] = useState("");
     const firstName = item.name.split(" ")[0]
+    const userData = localStorage.getItem("user");
 
     const handleSubmit = (e) => {
       e.preventDefault();
@@ -21,10 +23,17 @@ const ChatInput = ({ item, onSendMessage }) => {
     };
 
     const handleKeyDown = (event) => {
-        if (event.key === 'Enter') {
-          handleSubmit(event);
-        }
+      if (event.key === 'Enter') {
+          // Check if the user is logged in
+          if (!userData) {
+              // Optionally, show a message or prevent action
+              alert("You must be logged in to send a message.");
+          }
+          
+          handleSubmit(event); // Call the submit function if logged in
+          }
       };
+  
   
     return (
     <form onSubmit={handleSubmit}>
@@ -42,9 +51,11 @@ const ChatInput = ({ item, onSendMessage }) => {
               value={text}
               onChange={(e) => setText(e.target.value)}
               onKeyDown={handleKeyDown}
+              
             ></textarea>
             <button
               type="submit"
+              disabled={!userData} // Disable button if user is not logged in or message is empty
               className="absolute top-1/2 right-3 transform -translate-y-1/2 p-3 text-[#FF6FCF] rounded-full cursor-pointer hover:bg-gray-300 bg-gray-100"
             >
               <FaArrowUpLong />
