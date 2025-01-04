@@ -1,7 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react'
 import SidebarItem from './SidebarItem'
 import { AuthContext } from "../api/AuthContext";
-import getUserData from "../api/getUserData";
 
 // icons
 import { IoHomeOutline } from "react-icons/io5";
@@ -16,27 +15,28 @@ import { FaPerson } from "react-icons/fa6";
 import { FaPhoneSquareAlt } from "react-icons/fa";
 
 const Sidebar = ({ isOpen, onLoginClick }) => {
-    const { logout } = useContext(AuthContext);
-    const storedToken = localStorage.getItem("token");
-    console.log(storedToken)
-    const [userData, setUserData] = useState(null);
+    const { logout, user: userData } = useContext(AuthContext);
 
     const menuItems = [
         {
           icons: <IoHomeOutline size={30} />,
-          label: 'Home'
+          label: 'Home',
+          route: "/"
         },
         {
           icons: <IoFemale size={30} />,
-          label: 'Cats'
+          label: 'Cats',
+          route: "/"
         },
         {
           icons: <IoMale size={30} />,
-          label: 'Dogs'
+          label: 'Dogs',
+          route: "/ai-dogs"
         },
         {
           icons: <GiFlowerTwirl size={30} />,
-          label: 'Anime'
+          label: 'Anime',
+          route: "/ai-anime"
         },
         // {
         //   icons: <IoCreateOutline size={30} />,
@@ -48,11 +48,13 @@ const Sidebar = ({ isOpen, onLoginClick }) => {
         // },
         {
           icons: <CiSettings size={30} />,
-          label: 'Settings'
+          label: 'Settings',
+          route: "/"
         },
         {
           icons: <FaPhoneSquareAlt size={30} />,
-          label: 'Contact us'
+          label: 'Contact us',
+          route: "/contact-us"
         }
       ]
     
@@ -60,25 +62,6 @@ const Sidebar = ({ isOpen, onLoginClick }) => {
       icons: <MdLogout size={30} />,
       label: 'Logout'
     }
-
-    useEffect(() => {
-      const fetchData = async () => {
-        try {
-          if (storedToken) {
-            const data = await getUserData(storedToken);
-            setUserData(data);
-          } else {
-            setUserData(null); // Clear user data if no token
-          }
-        } catch (error) {
-          console.error("Failed to fetch user data.");
-        }
-      };
-  
-      fetchData();
-    }, [storedToken]);
-
-    
 
   return (
     <nav
@@ -89,11 +72,17 @@ const Sidebar = ({ isOpen, onLoginClick }) => {
 
     {/* Body */}
     <ul className="flex-1">
-      {menuItems.map((item, index) => (
-        <div key={index} className="cursor-pointer">
-          <SidebarItem isOpen={isOpen} item={item} />
-        </div>
-      ))}
+    {menuItems.map((item, index) => (
+      <div key={index} className="cursor-pointer">
+        <SidebarItem 
+          isOpen={isOpen} 
+          item={item} 
+          index={index} 
+          route={item.route} // Assuming `link` is a property in the `item` object
+        />
+      </div>
+    ))}
+
       {userData ? (
         <div onClick={logout} className="cursor-pointer">
           <SidebarItem isOpen={isOpen} item={logoutButton} />
@@ -105,7 +94,7 @@ const Sidebar = ({ isOpen, onLoginClick }) => {
 
 
     {/* Footer */}
-    <div className="flex cursor-pointer hover:underline items-center gap-2 px-3 py-2">
+    <div className="flex cursor-pointer hover:underline items-center gap-2 px-3 py-2 group" onClick={onLoginClick}>
       <div>
         <FaUserCircle size={30} />
       </div>
@@ -120,7 +109,7 @@ const Sidebar = ({ isOpen, onLoginClick }) => {
           </>
         ) : (
           <>
-            <button onClick={onLoginClick} className="hover:underline px-2">
+            <button className="group-hover:underline px-2">
               Login
             </button>
           </>

@@ -4,13 +4,16 @@ import './index.css'
 import App from './App.jsx'
 import { ConversationProvider } from './api/ConversationContext';
 import { AuthProvider } from "./api/AuthContext";
+import { CharacterProvider } from './api/CharacterContext.jsx';
 
 createRoot(document.getElementById('root')).render(
-  <StrictMode>
+  // <StrictMode>
     <AuthProvider>
-      <ConversationProvider>
-        <App />
-      </ConversationProvider>
+      <CharacterProvider>
+        <ConversationProvider>
+          <App />
+        </ConversationProvider>
+      </CharacterProvider>
     </AuthProvider>
-  </StrictMode>,
+  // </StrictMode>,
 )

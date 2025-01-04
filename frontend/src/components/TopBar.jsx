@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import { AuthContext } from "../api/AuthContext";
 
 const TopBar = ({ isOpen, setOpen, onLoginClick, onCreateClick }) => {
-    // const { user, logout } = useContext(AuthContext);
+    const { user, logout } = useContext(AuthContext);
   return (
     <div>
         <div className="fixed top-0 left-0 w-full bg-[#121212] z-50">
@@ -23,9 +23,32 @@ const TopBar = ({ isOpen, setOpen, onLoginClick, onCreateClick }) => {
                     </Link>
                     <div className="ml-auto">
                         <div className="flex space-x-2 py-2 px-4">
-                            <Button label="Create Account" className="hidden sm:block" onClick={onCreateClick} />
-                            {/* <Button label="Join" className="block sm:hidden" onClick={onCreateClick} /> */}
-                            <Button label="Login" className="block" onClick={onLoginClick} />
+                            {!user ? (
+                                <>
+                                {/* Join button - Visible only below 'md' */}
+                                <Button
+                                    label="Join"
+                                    classes="block md:hidden"
+                                    onClick={onCreateClick}
+                                />
+                                
+                                {/* Create Account button - Visible only at 'md' and above */}
+                                <Button
+                                    label="Create Account"
+                                    classes="hidden md:block"
+                                    onClick={onCreateClick}
+                                />
+                                
+                                {/* Login button - Always visible */}
+                                <Button
+                                    label="Login"
+                                    classes="block"
+                                    onClick={onLoginClick}
+                                />
+                                </>
+                            ) : (
+                                <Button label="Logout" classes="block" onClick={logout} />
+                            )}
                         </div>
                     </div>
                 </div>

@@ -45,7 +45,7 @@ const MainLayout = ({ children }) => {
                     setAuthVisible(true);  // Show AuthScreen
                     setIsLoginVisible(true);  // Make sure Login is visible initially
                 }} toggleSidebar={() => setOpen(!isOpen)} />
-                <div className={`${isOpen ? 'sm:pl-56 pl-20' : 'pl-20'} transition-all duration-500 ease-in-out`}>
+                <div className={`${isOpen ? 'sm:pl-60 pl-24' : 'pl-24'} transition-all duration-500 ease-in-out`}>
                     {children}
                 </div>
             </div>

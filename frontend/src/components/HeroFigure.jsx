@@ -5,14 +5,12 @@ const HeroFigure = ({ imageSrc, imageAlt, textContent }) => {
   return (
     <div>
         <figure className="relative items-center justify-center">
-            <a href="#">
             <img
-                className="w-full h-96 object-cover rounded-lg shadow-lg"
+                className="w-full object-contain rounded-lg shadow-lg"
                 src={imageSrc}
                 alt={imageAlt}
             />
-            </a>
-            <HeroText {...textContent} />
+            {/* <HeroText {...textContent} /> */}
         </figure>
     </div>
   )

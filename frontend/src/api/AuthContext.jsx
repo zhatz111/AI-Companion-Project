@@ -1,50 +1,67 @@
 import React, { createContext, useState, useEffect } from "react";
-import { login as apiLogin, register } from "./apiService"; // Import functions from apiService.jsx
+import { login as apiLogin, register, getUserData } from "./apiService"; // Import functions from apiService.jsx
+// import getUserData from "./getUserData"
 
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null); // Store user information
   const [token, setToken] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    // Check localStorage for user info and token on initial load
-    const storedUser = localStorage.getItem("user");
-    const storedToken = localStorage.getItem("token");
-    if (storedUser && storedToken) {
-      try {
-        setUser(JSON.parse(storedUser));
-        setToken(storedToken);
-      } catch (error) {
-        console.error("Error parsing user or token from localStorage:", error);
-      }
-    }
-    setLoading(false); // Mark loading as complete
-  }, []);
 
   const login = async (email, password) => {
+    if (user) {
+      console.log("User is already logged in");
+      return; // Don't trigger login if the user is already logged in
+    }
+  
     try {
-      console.log("attempting login")
-      const { access_token, user: userData } = await apiLogin(email, password); // Adjust based on your backend response
-      setUser(userData);
-      setToken(access_token);
-      localStorage.setItem("user", JSON.stringify(userData)); // Persist user data
-      localStorage.setItem("token", access_token); // Persist token
+      console.log("attempting login");
+      const { access_token } = await apiLogin(email, password);
+      const userData = await getUserData(access_token);
+      localStorage.setItem("user", JSON.stringify(userData));
+      localStorage.setItem("token", access_token);
+
+      const storedUser = localStorage.getItem("user");
+      const storedToken = localStorage.getItem("token");
+      setUser(JSON.parse(storedUser));
+      setToken(storedToken);
+      
     } catch (error) {
-      console.error("Login error:", error.response?.data || error.message)
+      console.error("Login error:", error.response?.data || error.message);
       if (error.response) {
         console.log("Detailed error:", error.response.data);
       }
       throw error;
     }
   };
+  
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      if (user && token) {
+        return; // Don't fetch if user and token are already set
+      }
+      
+      try {
+        const storedUser = localStorage.getItem("user");
+        const storedToken = localStorage.getItem("token");
+        
+        if (storedUser && storedToken) {
+          setUser(JSON.parse(storedUser));
+          setToken(storedToken);
+        }
+      } catch (error) {
+        console.error("Error parsing user or token from localStorage:", error);
+      }
+    };
+  
+    fetchUserInfo();
+  }, [user, token]); // Only re-run if user or token state changes
 
   const logout = () => {
-    setUser(null);
-    setToken(null);
     localStorage.removeItem("user");
     localStorage.removeItem("token");
+    setUser(null);
+    setToken(null);
   };
 
   const registerUser = async (username, email, password) => {
@@ -56,10 +73,6 @@ export const AuthProvider = ({ children }) => {
       throw error;
     }
   };
-
-  if (loading) {
-    return <p>Loading...</p>; // Render a loading state while initializing
-  }
 
   return (
     <AuthContext.Provider value={{ user, token, login, logout, registerUser }}>

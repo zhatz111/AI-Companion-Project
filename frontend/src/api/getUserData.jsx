@@ -1,6 +1,4 @@
 import axios from "axios";
-// import { useContext } from "react";
-// import { AuthContext } from "./AuthContext";
 
 const API_BASE_URL = "http://localhost:8000";
 
@@ -10,6 +8,7 @@ const getUserData = async ( token ) => {
       Authorization: `Bearer ${token}`,
     },
   });
+  console.log(response.data)
   return response.data;
 };
 

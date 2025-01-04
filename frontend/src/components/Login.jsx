@@ -2,6 +2,7 @@ import React, { useState, useContext } from 'react';
 import { MdEmail } from "react-icons/md";
 import { RiLockPasswordLine } from "react-icons/ri";
 import { AuthContext } from '../api/AuthContext';
+import { forgotPassword } from '../api/apiService'; // Import your forgotPassword API call
 
 function timeout(delay) {
     return new Promise( res => setTimeout(res, delay) );
@@ -14,6 +15,7 @@ const Login = ({ isVisible, onClose, onSignUp }) => {
 
     const [formData, setFormData] = useState({ email: "", password: "" });
     const [message, setMessage] = useState("");
+    const [reset, setReset] = useState(false)
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -22,20 +24,32 @@ const Login = ({ isVisible, onClose, onSignUp }) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        console.log(formData.email)
         try {
-            login(formData.email, formData.password);
-            setMessage("Login successful!");
-            setFormData({ email: "", password: "" })
-            await timeout(500);
-            onClose();
+            if (reset) {
+                // Call forgotPassword when reset is true
+                await forgotPassword(formData.email);
+                setMessage("Password reset link sent successfully!");
+                setFormData({ email: ""});
+                await timeout(500);
+                onClose();
+            } else {
+                // Call login when reset is false
+                await login(formData.email, formData.password);
+                setMessage("Login successful!");
+                setFormData({ email: "", password: "" });
+                await timeout(500);
+                onClose();
+            }
         } catch (error) {
-            setMessage("Error: " + error.response?.data?.detail || "Something went wrong.");
+            setMessage(error.response?.data?.detail || "Something went wrong.");
         }
-        
     };
+    
 
     return (
         <div>
+            {!reset ? (
             <div
                 className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50  z-50"
                 onClick={onClose} // Close the overlay when clicking outside
@@ -76,12 +90,13 @@ const Login = ({ isVisible, onClose, onSignUp }) => {
                             />
                         </div>
                         <p className="text-sm font-light text-gray-400">
-                            <a
-                                href="#"
+                            <button
+                                type="button"
+                                onClick={() => setReset(!reset)}
                                 className="font-medium text-white hover:underline"
                             >
                                 Forgot Password?
-                            </a>
+                            </button>
                         </p>
                         <button
                             type="submit"
@@ -103,6 +118,55 @@ const Login = ({ isVisible, onClose, onSignUp }) => {
                     </form>
                 </div>
             </div>
+            ) : (
+            <div
+                className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
+                onClick={onClose} // Close the overlay when clicking outside
+            >
+                <div
+                    className="bg-[#121212] rounded-lg p-8 shadow-lg w-full max-w-md"
+                    onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside
+                >
+                    <h2
+                        href="/"
+                        className="flex items-center mb-6 text-2xl font-semibold text-white"
+                    >
+                        Reset Password
+                    </h2>
+                    <form onSubmit={handleSubmit} className="space-y-4 md:space-y-6">
+                        <div>
+                            <MdEmail size="20" className='absolute text-gray-400 mt-3 ml-3' />
+                            <input
+                                type="email"
+                                name="email"
+                                placeholder="Email"
+                                value={formData.email}
+                                onChange={handleChange}
+                                required
+                                className="rounded-md outline-none pl-10 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500"
+                            />
+                        </div>
+                        <button
+                            type="submit"
+                            className="w-full outline-none text-white bg-[#FF6FCF] hover:bg-[#FF6FCF] focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
+                        >
+                            Reset Password
+                        </button>
+                        {message && <p className="mt-4 text-white text-sm">{message}</p>}
+                        <p className="text-sm font-light text-gray-400">
+                            Remember your password?{' '}
+                            <button
+                                type="button"
+                                onClick={() => setReset(!reset)}
+                                className="font-medium text-white hover:underline"
+                            >
+                                Login
+                            </button>
+                        </p>
+                    </form>
+                </div>
+            </div>
+            )}
         </div>
     );
 };

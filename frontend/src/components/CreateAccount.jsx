@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import { MdEmail } from "react-icons/md";
 import { RiLockPasswordLine } from "react-icons/ri";
 import { MdPermIdentity } from "react-icons/md";
@@ -11,7 +11,7 @@ function timeout(delay) {
 const CreateAccount = ({ isVisible, onClose, onLogin }) => {
     if (!isVisible) return null; // Do not render if not visible
 
-    const { register } = useContext(AuthContext);
+    const { registerUser } = useContext(AuthContext);
 
     const [formData, setFormData] = useState({ username: "", email: "", password: "" });
     const [message, setMessage] = useState("");
@@ -24,7 +24,7 @@ const CreateAccount = ({ isVisible, onClose, onLogin }) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await register(formData.username, formData.email, formData.password);
+            const response = await registerUser(formData.username, formData.email, formData.password);
             setMessage("Account Succesfully Created!");
             setFormData({ username: "", email: "", password: "" })
             await timeout(500);

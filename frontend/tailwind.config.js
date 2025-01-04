@@ -4,6 +4,9 @@ export default {
   theme: {
     darkMode: "class",
     extend: {
+      transitionProperty: {
+        width: 'width'
+      },
       fontFamily: {
         body: [
           "Inter",
@@ -44,7 +47,7 @@ export default {
         128: "32rem",
       },
       gridTemplateColumns: {
-        "70/30": "70% 28%",
+        "70/30": "70% 30%",
       },
       colors: {
         primary: {
@@ -65,12 +68,13 @@ export default {
         ms: "320px",
         mm: "375px",
         sm: "426px",
-        md: "768px",
+        md: "600px",
         lg: "1024px",
-        xl: "1440px",
-        "2xl": "1536px",
-        "3xl": "1920px",
-        "4xl": "2560px",
+        xl: "1250px",
+        "2xl": "1440px",
+        "3xl": "1536px",
+        "4xl": "1920px",
+        "5xl": "2560px",
       },
     },
     borderWidth: {
