@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import Message from './Message';
 import { BsArrowsCollapseVertical } from "react-icons/bs";
 
@@ -18,7 +18,7 @@ function calculateRelativeTime(timestamp) {
   if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)} hr`;
 
   const daysAgo = Math.floor(diffInSeconds / 86400);
-  return daysAgo === 1 ? 'Yesterday' : `${daysAgo} d`;
+  return daysAgo === 1 ? 'Yesterday' : `${daysAgo} day(s)`;
 }
 
 // Function to append relativeTime to each message
@@ -31,6 +31,12 @@ function addRelativeTimeToMessages(messages) {
 
 const MessageList = ({ item, messages }) => {
   const [refreshedMessages, setRefreshedMessages] = useState([]);
+  const messagesEndRef = useRef(null); // Ref to track the end of the messages list
+
+  // Scroll to the bottom of the messages container
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth", block: "end", inline: "nearest" });
+  };
 
   // When the messages prop changes, update the refreshedMessages state
   useEffect(() => {
@@ -53,7 +59,7 @@ const MessageList = ({ item, messages }) => {
   }, []); // Only run once on mount
 
   return (
-    <div>
+    <div className="message-list-container">
       {refreshedMessages.map((message) => (
         <Message
           key={message.id}

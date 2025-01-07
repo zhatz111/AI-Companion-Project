@@ -2,11 +2,13 @@ import React, { useState } from 'react';
 import Sidebar from '../components/Sidebar';
 import TopBar from '../components/TopBar';
 import AuthScreen from '../components/AuthScreen'; // Use AuthScreen instead of Login and CreateAccount
+import Settings from '../components/Settings';
 
 const MainLayout = ({ children }) => {
     const [isOpen, setOpen] = useState(false);
     const [isAuthVisible, setAuthVisible] = useState(false); // Track the visibility of AuthScreen
     const [isLoginVisible, setIsLoginVisible] = useState(true); // Track which screen (Login or CreateAccount) to show
+    const [isSettingsVisible, setIsSettingsVisible] = useState(false);
 
     const handleShowCreateAccount = () => {
         setIsLoginVisible(false); // Show Create Account view
@@ -17,7 +19,7 @@ const MainLayout = ({ children }) => {
     };
 
     return (
-        <div className="flex overflow-y-auto scrollbar bg-[#212121]">
+        <div className="flex overflow-y-auto bg-[#212121]">
             <TopBar
                 isOpen={isOpen}
                 setOpen={setOpen}
@@ -40,11 +42,13 @@ const MainLayout = ({ children }) => {
                 />
             )}
 
-            <div className="flex-1 overflow-y-auto">
+            <Settings onClose={() => setIsSettingsVisible(false)} setIsSettingsVisible={setIsSettingsVisible} isSettingsVisible={isSettingsVisible}/>
+
+            <div className="flex-1 overflow-y-auto ">
                 <Sidebar isOpen={isOpen}  onLoginClick={() => {
                     setAuthVisible(true);  // Show AuthScreen
                     setIsLoginVisible(true);  // Make sure Login is visible initially
-                }} toggleSidebar={() => setOpen(!isOpen)} />
+                }} toggleSidebar={() => setOpen(!isOpen)} onSettingsClick={() => setIsSettingsVisible(true)}/>
                 <div className={`${isOpen ? 'sm:pl-60 pl-24' : 'pl-24'} transition-all duration-500 ease-in-out`}>
                     {children}
                 </div>

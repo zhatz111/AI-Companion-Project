@@ -2,7 +2,7 @@
 import os
 import json
 import secrets
-from typing import Optional, List, Annotated
+from typing import Optional, List, Annotated, Dict
 from datetime import datetime, timedelta, timezone
 
 # Third Party Imports
@@ -16,8 +16,8 @@ from pydantic_settings import BaseSettings
 from pydantic import BaseModel, EmailStr, Field
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi_mail import FastMail, MessageSchema, ConnectionConfig
-from fastapi import FastAPI, HTTPException, Depends, Body, Query, Form
 from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
+from fastapi import FastAPI, HTTPException, status, Request, Depends, Body, Query, Form
 
 # Load in all env variables
 load_dotenv()
@@ -67,7 +67,8 @@ client = OpenAI(
 # Security configuration
 SECRET_KEY = os.getenv("SECRET_KEY")  # Replace with a strong secret key
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
+ACCESS_TOKEN_EXPIRE_MINUTES = 30  # 15 minutes
+REFRESH_TOKEN_EXPIRE_DAYS = 7  # 7 days
 
 # OAuth2 scheme
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/login")
@@ -85,10 +86,19 @@ class UserInDB(BaseModel):
     email: EmailStr
     hashed_password: str
     id: Optional[str] = None
+    age: Optional[int] = None
+    height_feet: Optional[int] = None
+    height_inches: Optional[int] = None
+    weight: Optional[int] = None
+    gender: Optional[str] = None
+    identity: Optional[str] = None
+    sexuality: Optional[str] = None
+    politics: Optional[str] = None
 
 
 class Token(BaseModel):
     access_token: str
+    refresh_token: str
     token_type: str
 
 
@@ -123,14 +133,13 @@ class ResetPassword(BaseModel):
     )
     reset_time: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
+
 class FeedbackForm(BaseModel):
     email: EmailStr
     subject: str = Field(..., min_length=1, max_length=100)
     message: str = Field(..., min_length=1, max_length=1000)
-    valid_user: bool = False,
-    feedback_time: datetime = Field(
-        default_factory=lambda: datetime.now(timezone.utc)
-    )
+    valid_user: bool = (False,)
+    feedback_time: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 
 # Configuration settings
@@ -182,9 +191,48 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
 
 def create_access_token(data: dict, expires_delta: timedelta | None = None) -> str:
     to_encode = data.copy()
-    expire = datetime.now(timezone.utc) + (expires_delta or timedelta(minutes=15))
+    expire = datetime.now(timezone.utc) + (
+        expires_delta or timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    )
     to_encode.update({"exp": expire})
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+
+
+def create_refresh_token(data: dict, expires_delta: timedelta | None = None) -> str:
+    to_encode = data.copy()
+    expire = datetime.now(timezone.utc) + (
+        expires_delta or timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS)
+    )
+    to_encode.update({"exp": expire})
+    return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+
+
+def validate_access_token(token: str) -> Dict:
+    """
+    Validates the JWT token.
+    - Decodes the token and checks the expiration.
+    - Returns the payload if valid.
+    """
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        # Check expiration
+        if payload.get("exp") and datetime.fromtimestamp(
+            payload["exp"], tz=timezone.utc
+        ) < datetime.now(timezone.utc):
+            raise HTTPException(status_code=401, detail="Token has expired")
+        return payload
+    except JWTError as e:
+        raise HTTPException(status_code=401, detail="Invalid token") from e
+
+
+def validate_refresh_token(refresh_token: str):
+    try:
+        payload = jwt.decode(refresh_token, SECRET_KEY, algorithms=[ALGORITHM])
+        return payload
+    except JWTError as exc:
+        raise HTTPException(
+            status_code=401, detail="Invalid or expired refresh token"
+        ) from exc
 
 
 def get_user(email: str) -> UserInDB | None:
@@ -292,16 +340,16 @@ async def send_feedback_confirmation(email: EmailStr):
         print(f"Error sending confirmation email: {e}")
 
 
-
 # -----------------------------------------------------------------
 
 # ROUTES
+
 
 @app.post("/api/register", response_model=Token)
 async def register(user: User):
     if users_collection.find_one({"email": user.email}):
         raise HTTPException(status_code=400, detail="Email already registered")
-    
+
     hashed_password = hash_password(user.password)
 
     new_user = {**user.model_dump(), "hashed_password": hashed_password}
@@ -314,7 +362,7 @@ async def register(user: User):
 
 @app.post("/api/login", response_model=Token)
 async def login(form_data: OAuth2PasswordRequestForm = Depends()):
-    user = get_user(form_data.username)  # `form_data.username` holds the email
+    user = get_user(form_data.username)
     if not user:
         raise HTTPException(status_code=400, detail="Incorrect username or password")
 
@@ -326,7 +374,13 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
         raise HTTPException(status_code=400, detail="Incorrect username or password")
 
     access_token = create_access_token(data={"sub": user.email})
-    return {"access_token": access_token, "token_type": "bearer"}
+    refresh_token = create_refresh_token(data={"sub": user.email})
+
+    return {
+        "access_token": access_token,
+        "refresh_token": refresh_token,
+        "token_type": "bearer",
+    }
 
 
 @app.get("/api/user", response_model=UserInDB)
@@ -463,7 +517,7 @@ async def generate_response(
     """
     try:
         completion = client.chat.completions.create(
-            model="meta-llama/Meta-Llama-3.1-8B-Instruct-fast",
+            model="mistralai/Mixtral-8x7B-Instruct-v0.1-fast",  # "mistralai/Mistral-Nemo-Instruct-2407",
             messages=[
                 {
                     "role": "system",
@@ -498,6 +552,7 @@ async def generate_response(
             status_code=500, detail=f"Error generating response: {str(e)}"
         ) from e
 
+
 @app.post("/api/forgot-password", response_model=ResetPassword)
 async def forgot_password(email: Annotated[str, Form()]):
     user = users_collection.find_one({"email": email})
@@ -509,15 +564,14 @@ async def forgot_password(email: Annotated[str, Form()]):
     time_window_start = now - timedelta(hours=48)
 
     # Check the number of resets in the last 48 hours
-    recent_resets_count = password_resets_collection.count_documents({
-        "email": email,
-        "reset_time": {"$gte": time_window_start}
-    })
+    recent_resets_count = password_resets_collection.count_documents(
+        {"email": email, "reset_time": {"$gte": time_window_start}}
+    )
 
     if recent_resets_count >= 3:
         raise HTTPException(
             status_code=429,  # Too Many Requests
-            detail="Too many password reset requests in the last 48 hours. Please try again later."
+            detail="Too many password reset requests in the last 48 hours. Please try again later.",
         )
 
     # Generate a secure token and save it with an expiry
@@ -534,6 +588,7 @@ async def forgot_password(email: Annotated[str, Form()]):
     await send_reset_email(email, token)
 
     return ResetPassword(**reset_data)
+
 
 @app.post("/api/reset-password", response_model=UserInDB)
 async def reset_password(
@@ -553,9 +608,7 @@ async def reset_password(
     print(token)
     reset_request = password_resets_collection.find_one({"hashed_token": token})
     if not reset_request:
-        raise HTTPException(
-            status_code=404, detail="Password reset request not found"
-        )
+        raise HTTPException(status_code=404, detail="Password reset request not found")
 
     # Retrieve the datetime object (assuming it is offset-naive)
     expiration_time = reset_request["expiration_time"]
@@ -578,7 +631,7 @@ async def reset_password(
             {"hashed_token": token}, {"$set": {"hashed_token": hashed_token}}
         )
         raise HTTPException(status_code=404, detail="User not found")
-    
+
     # Hash the token after resetting the password
     password_resets_collection.find_one_and_update(
         {"hashed_token": token}, {"$set": {"hashed_token": hashed_token}}
@@ -598,9 +651,6 @@ async def contact_us(
     subject: Annotated[str, Form()],
     message: Annotated[str, Form()],
 ):
-    print(email)
-    print(subject)
-    print(message)
     valid = False
     user = users_collection.find_one({"email": email})
     if user:
@@ -611,7 +661,7 @@ async def contact_us(
         "subject": subject,
         "message": message,
         "valid_user": valid,
-        "feedback_time": datetime.now(timezone.utc)
+        "feedback_time": datetime.now(timezone.utc),
     }
 
     feedback_collection.insert_one(feedback)
@@ -619,3 +669,284 @@ async def contact_us(
     await send_feedback_confirmation(email)
 
     return FeedbackForm(**feedback)
+
+
+@app.post("/api/token/validate")
+async def validate_token_endpoint(token: str = Depends(oauth2_scheme)):
+    """
+    Endpoint to validate an access token.
+    Returns the decoded payload if the token is valid.
+    """
+    try:
+        payload = validate_access_token(token)  # Validate the token
+        return {"message": "Token is valid", "payload": payload}
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid or expired token"
+        ) from e
+
+
+@app.post("/api/refresh")
+async def refresh_token_validation(refresh_token: str = Depends(oauth2_scheme)):
+    """
+    Endpoint to validate and refresh the access token using the refresh token.
+    """
+    if not refresh_token:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Refresh token missing"
+        )
+
+    # Validate the refresh token (you may need to implement validate_refresh_token)
+    try:
+        print("did i make it this far???")
+        print(refresh_token)
+        payload = validate_refresh_token(
+            refresh_token
+        )  # Assuming this function validates the refresh token
+        print("this is the payload")
+        print(payload)
+        # Create a new access token
+        new_access_token = create_access_token(data={"sub": payload["sub"]})
+
+        return {"access_token": new_access_token}
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid or expired refresh token",
+        ) from e
+
+
+@app.post("/api/change-user-info", response_model=UserInDB)
+async def change_user_info(
+    username: Optional[str] = Body(None),
+    email: Optional[EmailStr] = Body(None),
+    password: Optional[str] = Body(None),
+    user: UserInDB = Depends(get_current_user),
+):
+
+    if not any([username, email, password]):
+        raise HTTPException(
+            status_code=400, detail="At least one field must be provided."
+        )
+
+    update_fields = {}
+
+    if username and username != user.username:
+        update_fields["username"] = username
+
+    if email and email != user.email:
+        # Query the database to check if the email already exists
+        existing_user = users_collection.find_one({"email": email})
+        if existing_user:
+            raise HTTPException(
+                status_code=409, detail="Email is already in use by another user."
+            )
+        update_fields["email"] = email
+
+    if password:
+        update_fields["hashed_password"] = hash_password(password)
+
+    if not update_fields:
+        raise HTTPException(
+            status_code=400,
+            detail="No valid updates provided. Check that new values are different from existing ones.",
+        )
+
+    try:
+        result = users_collection.find_one_and_update(
+            {"email": user.email},
+            {"$set": update_fields},
+            return_document=True,  # Return the updated document
+        )
+
+        if not result:
+            raise HTTPException(
+                status_code=404, detail="User not found. Update operation failed."
+            )
+
+        # Convert the result back into a UserInDB object
+        result["hashed_password"] = ""
+        updated_user = UserInDB(**result)
+        return updated_user
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, detail=f"An unexpected error occurred: {str(e)}"
+        ) from e
+
+
+@app.post("/api/update-personal-info", response_model=UserInDB)
+async def change_personal_info(
+    age: Optional[int] = Body(None),
+    height_feet: Optional[int] = Body(None),
+    height_inches: Optional[int] = Body(None),
+    weight: Optional[int] = Body(None),
+    gender: Optional[str] = Body(None),
+    identity: Optional[str] = Body(None),
+    sexuality: Optional[str] = Body(None),
+    politics: Optional[str] = Body(None),
+    user: UserInDB = Depends(get_current_user),
+):
+    # Check if at least one personal field is provided
+    if not any(
+        [
+            age,
+            height_feet,
+            height_inches
+            is not None,  # Explicitly check if height_inches is not None, allowing 0,
+            weight,
+            gender,
+            identity,
+            sexuality,
+            politics,
+        ]
+    ):
+        raise HTTPException(
+            status_code=400, detail="At least one personal field must be provided."
+        )
+
+    # Prepare the fields that will be updated
+    update_fields = {}
+
+    if age is not None:
+        update_fields["age"] = age
+
+    if height_feet is not None:
+        update_fields["height_feet"] = height_feet
+
+    if height_inches is not None:
+        update_fields["height_inches"] = height_inches
+
+    if weight is not None:
+        update_fields["weight"] = weight
+
+    if gender is not None:
+        update_fields["gender"] = gender
+
+    if identity is not None:
+        update_fields["identity"] = identity
+
+    if sexuality is not None:
+        update_fields["sexuality"] = sexuality
+
+    if politics is not None:
+        update_fields["politics"] = politics
+
+    # Check if any field needs to be updated
+    if not update_fields:
+        raise HTTPException(
+            status_code=400,
+            detail="No valid updates provided. Check that new values are different from existing ones.",
+        )
+
+    try:
+        # Update the user's document in the database
+        result = users_collection.find_one_and_update(
+            {"email": user.email},  # Find the user by email
+            {"$set": update_fields},  # Set the fields to be updated
+            return_document=True,  # Return the updated document
+        )
+
+        # If no user is found, raise an error
+        if not result:
+            raise HTTPException(
+                status_code=404, detail="User not found. Update operation failed."
+            )
+
+        # Convert the result back into a UserInDB object
+        result["hashed_password"] = ""  # Clear the hashed_password for security
+        updated_user = UserInDB(**result)
+        return updated_user
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, detail=f"An unexpected error occurred: {str(e)}"
+        ) from e
+
+
+@app.delete("/api/delete-chats")
+async def delete_chats(user: UserInDB = Depends(get_current_user)):
+
+    try:
+        # Fetch all conversations for the current user by username
+        conversations = list(conversations_collection.find({"username": user.username}))
+
+        # Check if there are any conversations to delete
+        if not conversations:
+            raise HTTPException(
+                status_code=404, detail="No conversations found for this user."
+            )
+
+        # Extract conversation IDs to delete associated messages and conversations
+        conversations_ids = [str(conversation["_id"]) for conversation in conversations]
+
+        # Delete all messages related to these conversations
+        result_messages = messages_collection.delete_many(
+            {"conversation_id": {"$in": conversations_ids}}
+        )
+
+        # Delete the conversations
+        result_conversations = conversations_collection.delete_many(
+            {"username": user.username}
+        )
+
+        # Check how many documents were deleted
+        if (
+            result_messages.deleted_count == 0
+            and result_conversations.deleted_count == 0
+        ):
+            raise HTTPException(
+                status_code=500, detail="No conversations or chats to delete."
+            )
+
+        # Return a success message with counts of deleted items
+        return {
+            "message": "Chats deleted successfully",
+            "deleted_conversations_count": result_conversations.deleted_count,
+            "deleted_messages_count": result_messages.deleted_count,
+        }
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, detail=f"An unexpected error occurred: {str(e)}"
+        ) from e
+
+
+@app.delete("/api/delete-account")
+async def delete_account(user: UserInDB = Depends(get_current_user)):
+
+    print(user)
+    try:
+        # Check if the user has any conversations
+        conversations = list(conversations_collection.find({"username": user.username}))
+        print(conversations)
+
+        if conversations:
+            # Extract conversation IDs to delete associated messages and conversations
+            conversations_ids = [str(conversation["_id"]) for conversation in conversations]
+            print(conversations_ids)
+            # Perform all delete operations in one go for efficiency
+            delete_messages_result = messages_collection.delete_many(
+                {"conversation_id": {"$in": conversations_ids}}
+            )
+            delete_conversations_result = conversations_collection.delete_many(
+                {"username": user.username}
+            )
+            # Ensure all delete operations were successful
+            if (
+                delete_messages_result.deleted_count == 0
+                or delete_conversations_result.deleted_count == 0
+            ):
+                raise HTTPException(
+                    status_code=500,
+                    detail="Failed to delete some or all of the user's data.",
+                )
+
+        users_collection.delete_one({"email": user.email})
+
+        return {"detail": "User account and associated data successfully deleted."}
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, detail=f"An unexpected error occurred: {str(e)}"
+        ) from e

@@ -29,7 +29,7 @@ const ResetPasswordPage = () => {
   return (
     <section className="bg-[#212121]">
       <div className="pt-20 pb-6 px-4 h-screen mx-auto max-w-screen-md">
-        <h2 className="mb-8 mt-8 text-4xl tracking-tight font-extrabold text-center text-white">
+        <h2 className="mb-8 mt-8 text-4xl font-extrabold text-center text-[#FF6FCF]">
           Contact Us
         </h2>
         <p className="pb-8 lg:pb-16 font-light text-center text-gray-300 sm:text-xl">
@@ -40,7 +40,7 @@ const ResetPasswordPage = () => {
           <div>
             <label
               htmlFor="email"
-              className="block pb-2 text-sm font-medium text-gray-300"
+              className="block pb-2 text-sm font-medium text-[#FF6FCF]"
             >
               Email
             </label>
@@ -57,7 +57,7 @@ const ResetPasswordPage = () => {
           <div>
             <label
               htmlFor="subject"
-              className="block pb-2 text-sm font-medium text-gray-300"
+              className="block pb-2 text-sm font-medium text-[#FF6FCF]"
             >
               Subject
             </label>
@@ -74,7 +74,7 @@ const ResetPasswordPage = () => {
           <div className="sm:col-span-2">
             <label
               htmlFor="message"
-              className="block pb-2 text-sm font-medium text-gray-300"
+              className="block pb-2 text-sm font-medium text-[#FF6FCF]"
             >
               Your message
             </label>

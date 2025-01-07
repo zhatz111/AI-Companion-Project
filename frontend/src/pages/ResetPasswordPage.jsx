@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { resetPassword } from '../api/apiService'; // Import your resetPassword API call
 import { RiLockPasswordLine } from "react-icons/ri";
+import { IoMdClose } from "react-icons/io";
 
 const ResetPasswordPage = () => {
   const [searchParams] = useSearchParams();
@@ -41,19 +42,16 @@ const ResetPasswordPage = () => {
   return (
     <div>
         <div
-            className="fixed inset-0 flex items-center justify-center bg-[#212121]"
+            className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-80"
         >
             <div
-                className="bg-[#121212] rounded-lg p-8 shadow-lg w-full max-w-md"
+                className="bg-[#212121] rounded-lg shadow-lg w-full max-w-md"
                 onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside
             >
-                <h2
-                    href="/"
-                    className="flex items-center mb-6 text-2xl font-semibold text-white"
-                >
-                    Reset Password
-                </h2>
-                <form onSubmit={handleSubmit} className="space-y-4 md:space-y-6">
+                <div className="border-b flex-row flex items-center justify-between border-[#FF6FCF] p-6">
+                    <h2 className="text-2xl font-semibold text-[#FF6FCF]">Reset Password</h2>
+                </div>
+                <form onSubmit={handleSubmit} className="p-6 space-y-4 md:space-y-6">
                     <div>
                         <RiLockPasswordLine size="20" className='absolute text-gray-400 mt-3 ml-3' />
                         <input

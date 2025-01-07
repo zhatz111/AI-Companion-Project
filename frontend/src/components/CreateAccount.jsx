@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react'
 import { MdEmail } from "react-icons/md";
+import { IoMdClose } from "react-icons/io";
 import { RiLockPasswordLine } from "react-icons/ri";
 import { MdPermIdentity } from "react-icons/md";
 import { AuthContext } from '../api/AuthContext';
@@ -37,20 +38,22 @@ const CreateAccount = ({ isVisible, onClose, onLogin }) => {
   return (
     <div>
         <div
-        className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
+        className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-80 z-50"
         onClick={onClose} // Close the overlay when clicking outside
         >
         <div
-            className="bg-[#121212] rounded-lg p-8 shadow-lg w-full max-w-md"
+            className="bg-[#212121] rounded-2xl shadow-lg w-full max-w-md"
             onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside
         >
-            <a
-            href="#"
-            className="flex items-center mb-6 text-2xl font-semibold text-white"
-            >
-            Create Account
-            </a>
-            <form onSubmit={handleSubmit} className="space-y-4 md:space-y-6">
+            <div className="border-b flex-row flex items-center justify-between border-[#FF6FCF] p-6">
+                <h2 className="text-2xl font-semibold text-[#FF6FCF]">Create Account</h2>
+                <IoMdClose
+                className="hover:bg-gray-500 p-2 rounded-full text-[#FF6FCF] cursor-pointer"
+                size={35}
+                onClick={onClose} // Add a close handler here
+                />
+            </div>
+            <form onSubmit={handleSubmit} className="p-6 space-y-4 md:space-y-6">
             <div>
                 <MdPermIdentity size="20" className='absolute text-gray-400 mt-3 ml-3'/>
                 <input
@@ -60,7 +63,7 @@ const CreateAccount = ({ isVisible, onClose, onLogin }) => {
                 value={formData.username}
                 onChange={handleChange}
                 required
-                className="rounded-md pl-10 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500"
+                className="rounded-md pl-10 outline-none block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500"
                 />
             </div>
             <div>
@@ -72,7 +75,7 @@ const CreateAccount = ({ isVisible, onClose, onLogin }) => {
                 value={formData.email}
                 onChange={handleChange}
                 required
-                className="rounded-md pl-10 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500"
+                className="rounded-md pl-10 block outline-none w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500"
                 />
             </div>
             <div>
@@ -84,7 +87,7 @@ const CreateAccount = ({ isVisible, onClose, onLogin }) => {
                 value={formData.password}
                 onChange={handleChange}
                 required
-                className="rounded-md pl-10 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500"
+                className="rounded-md pl-10 block outline-none w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500"
                 />
             </div>
             {/* <div>
@@ -99,7 +102,7 @@ const CreateAccount = ({ isVisible, onClose, onLogin }) => {
             </div> */}
 
             <p className="text-sm font-light text-gray-400">
-            Minimum of 6 Characters
+            Password Minimum of 6 Characters
             </p>
             <button
                 type="submit"

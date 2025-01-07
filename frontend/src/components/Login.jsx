@@ -1,5 +1,6 @@
 import React, { useState, useContext } from 'react';
 import { MdEmail } from "react-icons/md";
+import { IoMdClose } from "react-icons/io";
 import { RiLockPasswordLine } from "react-icons/ri";
 import { AuthContext } from '../api/AuthContext';
 import { forgotPassword } from '../api/apiService'; // Import your forgotPassword API call
@@ -51,20 +52,22 @@ const Login = ({ isVisible, onClose, onSignUp }) => {
         <div>
             {!reset ? (
             <div
-                className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50  z-50"
+                className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-80  z-50"
                 onClick={onClose} // Close the overlay when clicking outside
             >
                 <div
-                    className="bg-[#121212] rounded-lg p-8 shadow-lg w-full max-w-md"
+                    className="bg-[#212121] rounded-2xl shadow-lg w-full max-w-md"
                     onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside
                 >
-                    <h2
-                        href="/"
-                        className="flex items-center mb-6 text-2xl font-semibold text-white"
-                    >
-                        Sign In
-                    </h2>
-                    <form onSubmit={handleSubmit} className="space-y-4 md:space-y-6">
+                    <div className="border-b flex-row flex items-center justify-between border-[#FF6FCF] p-6">
+                        <h2 className="text-2xl font-semibold text-[#FF6FCF]">Login</h2>
+                        <IoMdClose
+                        className="hover:bg-gray-500 p-2 rounded-full text-[#FF6FCF] cursor-pointer"
+                        size={35}
+                        onClick={onClose} // Add a close handler here
+                        />
+                    </div>
+                    <form onSubmit={handleSubmit} className="p-6 space-y-4 md:space-y-6">
                         <div>
                             <MdEmail size="20" className='absolute text-gray-400 mt-3 ml-3' />
                             <input
@@ -120,20 +123,22 @@ const Login = ({ isVisible, onClose, onSignUp }) => {
             </div>
             ) : (
             <div
-                className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
+                className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-80 z-50"
                 onClick={onClose} // Close the overlay when clicking outside
             >
                 <div
-                    className="bg-[#121212] rounded-lg p-8 shadow-lg w-full max-w-md"
+                    className="bg-[#212121] rounded-lg shadow-lg w-full max-w-md"
                     onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside
                 >
-                    <h2
-                        href="/"
-                        className="flex items-center mb-6 text-2xl font-semibold text-white"
-                    >
-                        Reset Password
-                    </h2>
-                    <form onSubmit={handleSubmit} className="space-y-4 md:space-y-6">
+                    <div className="border-b flex-row flex items-center justify-between border-[#FF6FCF] p-6">
+                        <h2 className="text-2xl font-semibold text-[#FF6FCF]">Reset Password</h2>
+                        <IoMdClose
+                        className="hover:bg-gray-500 p-2 rounded-full text-[#FF6FCF] cursor-pointer"
+                        size={35}
+                        onClick={onClose} // Add a close handler here
+                        />
+                    </div>
+                    <form onSubmit={handleSubmit} className="p-6 space-y-4 md:space-y-6">
                         <div>
                             <MdEmail size="20" className='absolute text-gray-400 mt-3 ml-3' />
                             <input

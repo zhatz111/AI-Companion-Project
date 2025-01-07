@@ -13,30 +13,35 @@ import { IoCreateOutline } from "react-icons/io5";
 import { GiFlowerTwirl } from "react-icons/gi";
 import { FaPerson } from "react-icons/fa6";
 import { FaPhoneSquareAlt } from "react-icons/fa";
+import { LuMessagesSquare } from "react-icons/lu";
 
-const Sidebar = ({ isOpen, onLoginClick }) => {
+const Sidebar = ({ isOpen, onLoginClick, onSettingsClick }) => {
     const { logout, user: userData } = useContext(AuthContext);
 
     const menuItems = [
         {
           icons: <IoHomeOutline size={30} />,
           label: 'Home',
-          route: "/"
+          route: "/",
+          onClick: null
         },
         {
           icons: <IoFemale size={30} />,
           label: 'Cats',
-          route: "/"
+          route: "/",
+          onClick: null
         },
         {
           icons: <IoMale size={30} />,
           label: 'Dogs',
-          route: "/ai-dogs"
+          route: "/ai-dogs",
+          onClick: null
         },
         {
           icons: <GiFlowerTwirl size={30} />,
           label: 'Anime',
-          route: "/ai-anime"
+          route: "/ai-anime",
+          onClick: null
         },
         // {
         //   icons: <IoCreateOutline size={30} />,
@@ -47,20 +52,22 @@ const Sidebar = ({ isOpen, onLoginClick }) => {
         //   label: 'My Character'
         // },
         {
-          icons: <CiSettings size={30} />,
-          label: 'Settings',
-          route: "/"
-        },
-        {
-          icons: <FaPhoneSquareAlt size={30} />,
+          icons: <LuMessagesSquare size={30} />,
           label: 'Contact us',
-          route: "/contact-us"
+          route: "/contact-us",
+          onClick: null
         }
       ]
     
     const logoutButton = {
       icons: <MdLogout size={30} />,
       label: 'Logout'
+    }
+
+    const settingbutton = {
+      icons: <CiSettings size={30} />,
+      label: 'Settings',
+      onClick: onSettingsClick
     }
 
   return (
@@ -77,16 +84,22 @@ const Sidebar = ({ isOpen, onLoginClick }) => {
         <SidebarItem 
           isOpen={isOpen} 
           item={item} 
-          index={index} 
+          index={index}
           route={item.route} // Assuming `link` is a property in the `item` object
+          onClick={item.onClick}
         />
       </div>
     ))}
 
       {userData ? (
-        <div onClick={logout} className="cursor-pointer">
-          <SidebarItem isOpen={isOpen} item={logoutButton} />
-        </div>
+        <>
+          <div onClick={onSettingsClick} className="cursor-pointer">
+            <SidebarItem isOpen={isOpen} item={settingbutton} />
+          </div>
+          {/* <div onClick={logout} className="cursor-pointer">
+            <SidebarItem isOpen={isOpen} item={logoutButton} />
+          </div> */}
+        </>
       ) : (
         <></>
       )}

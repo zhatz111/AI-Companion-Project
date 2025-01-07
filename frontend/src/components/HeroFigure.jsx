@@ -1,18 +1,18 @@
 import React from 'react'
 import HeroText from './HeroText'
 
-const HeroFigure = ({ imageSrc, imageAlt, textContent }) => {
+const HeroFigure = ({ imageSrc, imageAlt }) => {
   return (
-    <div>
-        <figure className="relative items-center justify-center">
+    <div className='m-6'>
+        <figure className="">
             <img
-                className="w-full object-contain rounded-lg shadow-lg"
+                className="w-full rounded-2xl m-auto"
                 src={imageSrc}
                 alt={imageAlt}
             />
-            {/* <HeroText {...textContent} /> */}
         </figure>
     </div>
+
   )
 }
 

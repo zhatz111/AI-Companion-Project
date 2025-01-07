@@ -28,8 +28,7 @@ export const login = async (email, password) => {
         },
       }
     );
-    console.log("Data coming from Auth:", response.data["access_token"]);
-    // localStorage.setItem('token', response.data["access_token"]); // Save the token directly
+    console.log("Data coming from Auth:", response.data);
     return response.data; // Contains the JWT token
   };
 
@@ -40,7 +39,6 @@ export const getUserData = async (token) => {
       },
     });
     console.log(response.data)
-    console.log("this is an easter egg")
     return response.data;
   };
 
@@ -224,5 +222,197 @@ export const sendFeedback = async (email, subject, message) => {
     console.log("Feedback Form Response:", response.data);
     return response.data; // Return the API response
   };
+
+export const validateToken = async (token) => {
+    try {
+      console.log(token);
+  
+      const response = await axios.post(
+        `${API_BASE_URL}/api/token/validate`, 
+        {}, // No need to send token in body
+        {
+          headers: {
+            "Content-Type": "application/json", // This can be application/json or you can omit it if you're sending an empty body
+            "Authorization": `Bearer ${token}`, // Send the token in Authorization header
+          },
+        }
+      );
+      return response.data.message === "Token is valid"; // Return true if token is valid
+    } catch (error) {
+      console.error("Token validation failed:", error);
+      return false; // Return false on failure
+    }
+  };
+
+
+export const validateRefreshToken = async (refreshToken) => {
+    try {
+      console.log(refreshToken); // Log the token to ensure it's correct
+  
+      // Send the refresh token in the Authorization header
+      const response = await axios.post(
+        `${API_BASE_URL}/api/refresh`,
+        {}, // No need to send the token in the body
+        {
+          headers: {
+            "Content-Type": "application/json", // You can omit this or use application/json for an empty body
+            "Authorization": `Bearer ${refreshToken}`, // Send refresh token in Authorization header
+          },
+        }
+      );
+  
+      if (response.data && response.data.access_token) {
+        // Return success if a new access token is present
+        return { success: true, access_token: response.data.access_token };
+      }
+  
+      return { success: false, message: 'Invalid response data' }; // Handle unexpected responses
+    } catch (error) {
+      console.error("Token validation failed:", error);
+      return { success: false, message: error.message || "An error occurred" };
+    }
+  };
+  
+export const changeUserInfo = async (username, email, password, token) => {
+    try {
+      // Define the request body
+      console.log(username)
+      const userData = {
+        "username": username || null,
+        "email": email || null,  // If no email, send null
+        "password": password || null,
+      };
+
+      console.log(userData)
+      // Make the POST request
+      const response = await axios.post(`${API_BASE_URL}/api/change-user-info`, userData, {
+        headers: {
+          "Authorization": `Bearer ${token}`, // Replace with your token retrieval logic
+        },
+      });
+
+      if (response.status === 409) {
+          throw new Error("This email is already registered.");
+      }
+  
+      // Return the updated user data
+      return response.data;
+
+    } catch (error) {
+      if (error.response) {
+        // Handle server errors
+        console.error('Error response:', error.response.data);
+        throw new Error(error.response.data.detail || 'Failed to update user info.');
+
+      } else if (error.request) {
+        // Handle network errors
+        console.error('No response received:', error.request);
+        throw new Error('No response received from server.');
+
+      } else {
+        // Handle other errors
+        console.error('Error:', error.message);
+        throw new Error(error.message || 'An unexpected error occurred.');
+      }
+    }
+  };
+
+export const updatePersonalInfo = async (
+  age,
+  height_feet,
+  height_inches,
+  weight,
+  gender,
+  identity,
+  sexuality,
+  politics,
+  token
+) => {
+    try {
+      // Define the request body
+      console.log(age)
+      const userData = {
+        "age": age || null,
+        "height_feet": height_feet || null,
+        "height_inches": height_inches || null,
+        "weight": weight || null,
+        "gender": gender || null,
+        "identity": identity || null,
+        "sexuality": sexuality || null,
+        "politics": politics || null,
+      };
+
+      console.log(height_inches)
+
+      console.log(userData)
+      // Make the POST request
+      const response = await axios.post(`${API_BASE_URL}/api/update-personal-info`, userData, {
+        headers: {
+          "Authorization": `Bearer ${token}`, // Replace with your token retrieval logic
+        },
+      });
+  
+      // Return the updated user data
+      return response.data;
+
+    } catch (error) {
+      if (error.response) {
+        // Handle server errors
+        console.error('Error response:', error.response.data);
+        throw new Error(error.response.data.detail || 'Failed to update user info.');
+
+      } else if (error.request) {
+        // Handle network errors
+        console.error('No response received:', error.request);
+        throw new Error('No response received from server.');
+        
+      } else {
+        // Handle other errors
+        console.error('Error:', error.message);
+        throw new Error(error.message || 'An unexpected error occurred.');
+      }
+    }
+  };
+
+  // Function to delete chats
+export const deleteConvos = async (token) => {
+    try {
+      // Make the DELETE request to the API
+      const response = await axios.delete(`${API_BASE_URL}/api/delete-chats`, {
+        headers: {
+          'Authorization': `Bearer ${token}`, // Assuming you are using a Bearer token for authentication
+        }
+      });
+
+      if (response.status === 500) {
+          throw new Error("No conversations to delete.");
+      }
+  
+      // Return the response from the server
+      return response.data;
+    } catch (error) {
+      console.error('Error deleting chats:', error);
+      throw error;
+    }
+  };
+
+    // Function to delete account along with chats
+export const deleteUserAccount = async (token) => {
+  try {
+    // Make the DELETE request to the API
+    const response = await axios.delete(`${API_BASE_URL}/api/delete-account`, {
+      headers: {
+        'Authorization': `Bearer ${token}`, // Assuming you are using a Bearer token for authentication
+      }
+    });
+
+    // Return the response from the server
+    return response.data;
+  } catch (error) {
+    console.error('Error deleting account:', error);
+    throw error;
+  }
+};
+  
 
   

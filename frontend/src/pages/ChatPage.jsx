@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 
 import MessageList from '../components/MessageList';
@@ -20,6 +20,18 @@ const ChatPage = () => {
 
     const { getOrCreateConversation, currentConversation, loadMessages, sendMessage, currentMessages } = useContext(ConversationContext);
     const { characters, currentCharacter } = useContext(CharacterContext);
+
+    const messagesEndRef = useRef(null); // Ref for scrolling
+
+    // Scroll to the bottom when messages update
+    useEffect(() => {
+        const scrollToBottom = () => {
+            if (messagesEndRef.current) {
+                messagesEndRef.current.scrollIntoView({ behavior: "smooth", block: "end", inline: "nearest" });
+            }
+        };
+        scrollToBottom();
+    }, [currentMessages]); // Trigger when `currentMessages` changes
 
     // Memoize the conversation fetch logic and handle localStorage
     useEffect(() => {
@@ -77,7 +89,7 @@ const ChatPage = () => {
     return (
         <>
             {currentCharacter ? (
-                <div className="flex h-screen overflow-y-hidden">
+                <div className="flex h-screen overflow-y-auto">
                     <div className={` ${isCollapsed ? 'w-0' : 'w-100'} flex flex-col max-w-mm sm:max-w-sm lg:max-w-md xl:max-w-lg overflow-y-auto scrollbar duration-500`}>
                         <MessageProfile isCollapsed={isCollapsed} item={currentCharacter} />
                     </div>
@@ -85,6 +97,8 @@ const ChatPage = () => {
                     <div className={`flex flex-col ${isCollapsed ? 'flex-grow' : 'flex-1'} max-h-screen pb-2 mt-auto bg-[#212121] transition-all duration-500`}>
                         <div className="p-4 mt-16 pb-10 overflow-y-auto scrollbar">
                             <MessageList item={currentCharacter} messages={currentMessages} />
+                            {/* Ref element for auto-scrolling */}
+                            <div ref={messagesEndRef} />
                         </div>
                         <div className="sticky bottom-0 bg-[#212121] p-4">
                             <ChatInput item={currentCharacter} onSendMessage={handleSendMessage} onClick={() => setIsCollapsed(!isCollapsed)} />
