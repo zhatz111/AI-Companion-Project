@@ -4,8 +4,9 @@ import { FaArrowUpLong } from "react-icons/fa6";
 import { AuthContext } from "../api/AuthContext";
 import { ConversationContext } from '../api/ConversationContext';
 import { BsArrowsCollapseVertical } from "react-icons/bs";
+import { BiCollapseHorizontal } from "react-icons/bi";
 
-const ChatInput = ({ item, onSendMessage, onClick }) => {
+const ChatInput = ({ item, onSendMessage, onClickConvo, onClickProfile }) => {
     const [text, setText] = useState("");
     const firstName = item.name.split(" ")[0]
     const { user } = useContext(AuthContext);
@@ -17,6 +18,7 @@ const ChatInput = ({ item, onSendMessage, onClick }) => {
       if (text.trim()) {
         const newMessage = {
           sender: user.username,
+          role: "user",
           content: text,
           timeCreated: Date.now(),
           conversation_id: currentConversation.id
@@ -46,10 +48,10 @@ const ChatInput = ({ item, onSendMessage, onClick }) => {
       <div className="flex items-center max-w-6xl mx-auto px-4 w-full">
         {/* Collapse Button */}
         <div className="flex items-center justify-center px-2">
-          <BsArrowsCollapseVertical
+          <BiCollapseHorizontal
             className="text-white cursor-pointer"
-            size={30}
-            onClick={onClick} // Toggle visibility
+            size={20}
+            onClick={onClickConvo} // Toggle visibility
           />
         </div>
 
@@ -64,11 +66,15 @@ const ChatInput = ({ item, onSendMessage, onClick }) => {
                 id="chat"
                 rows="1"
                 wrap="soft"
-                className="block resize-none rounded-lg outline-none p-4 w-full text-md bg-[#303030] text-white pr-12 h-14"
+                className="block resize-none rounded-lg outline-none p-4 w-full text-sm text-nowrap sm:text-md bg-[#303030] text-white pr-16 h-14"
                 placeholder={`Message ${firstName}`}
                 value={text}
                 onChange={(e) => setText(e.target.value)}
                 onKeyDown={handleKeyDown}
+                onInput={(e) => {
+                  e.target.style.height = "auto"; // Reset the height
+                  e.target.style.height = `${e.target.scrollHeight}px`; // Set it to match content
+                }}
               ></textarea>
               <button
                 type="submit"
@@ -80,6 +86,14 @@ const ChatInput = ({ item, onSendMessage, onClick }) => {
             </div>
           </div>
         </form>
+
+        <div className="flex items-center justify-center px-2">
+          <BiCollapseHorizontal
+            className="text-white cursor-pointer"
+            size={20}
+            onClick={onClickProfile} // Toggle visibility
+          />
+        </div>
       </div>
 
   )

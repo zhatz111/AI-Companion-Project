@@ -14,22 +14,33 @@ const CreateAccount = ({ isVisible, onClose, onLogin }) => {
 
     const { registerUser } = useContext(AuthContext);
 
-    const [formData, setFormData] = useState({ username: "", email: "", password: "" });
+    const [formData, setFormData] = useState({ username: "", email: "", password: "", confirmPassword: "" });
     const [message, setMessage] = useState("");
+    const [match, setMatch] = useState(true);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData({ ...formData, [name]: value });
+        // Check if passwords match on input
+        if (name === "confirmPassword" && value !== formData.password) {
+            setMatch(false)
+            setMessage("Passwords do not match");
+        } else {
+            setMatch(true)
+            setMessage("");
+        }
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await registerUser(formData.username, formData.email, formData.password);
-            setMessage("Account Succesfully Created!");
-            setFormData({ username: "", email: "", password: "" })
-            await timeout(500);
-            onLogin();
+            if (match) {
+                const response = await registerUser(formData.username, formData.email, formData.password, formData.confirmPassword);
+                setMessage("Account Succesfully Created!");
+                setFormData({ username: "", email: "", password: "", confirmPassword: "" })
+                await timeout(500);
+                onLogin();
+            }
         } catch (error) {
             setMessage("Error: " + error.response?.data?.detail || "Something went wrong.");
         }
@@ -90,23 +101,24 @@ const CreateAccount = ({ isVisible, onClose, onLogin }) => {
                 className="rounded-md pl-10 block outline-none w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500"
                 />
             </div>
-            {/* <div>
+            <div>
                 <RiLockPasswordLine size="20" className='absolute text-gray-400 mt-3 ml-3' />
                 <input
-                type="confirm password"
-                id="confirm password"
+                type="password"
+                name="confirmPassword"
                 placeholder="Confirm Password"
-                className="rounded-md pl-10 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500"
+                value={formData.confirmPassword}
+                onChange={handleChange}
                 required
+                className={`${!match ? "bg-[#EE4B2B]/50" : ""} rounded-md pl-10 block outline-none bg-gray-700 w-full p-2.5 border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500`}
                 />
-            </div> */}
-
+            </div>
             <p className="text-sm font-light text-gray-400">
             Password Minimum of 6 Characters
             </p>
             <button
                 type="submit"
-                className="w-full text-white bg-[#FF6FCF] hover:bg-[#FF6FCF] focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
+                className="w-full text-white bg-[#FF6FCF] hover:bg-[#FF6FCF] outline-none font-medium rounded-lg text-sm px-5 py-2.5 text-center"
             >
                 Create Account
             </button>

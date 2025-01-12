@@ -12,17 +12,10 @@ import { BsArrowsCollapseVertical } from "react-icons/bs";
 
 const MessageProfile = ({ item, isCollapsed }) => {
     return (
-        <div className=" mt-24">
-            {/* <div className="flex justify-center p-4">
-                <BsArrowsCollapseVertical
-                className="text-white cursor-pointer"
-                size={30}
-                onClick={() => setIsCollapsed(!isCollapsed)} // Toggle visibility
-                />
-            </div> */}
-                <div>
-                <div className="flex">
-                    <img className="max-h-96 md:max-h-[36rem] md:max-w-md max-w-sm object-cover rounded-xl overflow-hidden mx-auto mb-4" src={item.alt_img_path} alt={item.name}></img>
+        <div className="flex mt-16 border-l border-[#FF6FCF] pt-6">
+            <div>
+                <div className="flex aspect-[10/15] mx-5 mb-3">
+                    <img className="object-cover rounded-xl overflow-hidden" src={item.alt_img_path} alt={item.name}></img>
                 </div>
                 <div className='pl-4 pt-2 pr-2'>
                     <h1 className="text-sm sm:text-2xl 2xl:text-3xl font-bold text-white text-left">{item.name}</h1>
@@ -87,7 +80,7 @@ const MessageProfile = ({ item, isCollapsed }) => {
                         </div>
                     </div>
                 </div>
-                </div>
+            </div>
         </div>
     )
 }

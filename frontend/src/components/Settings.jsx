@@ -1,4 +1,8 @@
 import React, { useState, useContext, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { ConversationContext } from '../api/ConversationContext';
+import { changeUserInfo, updatePersonalInfo, deleteConvos, deleteUserAccount, uploadImage } from "../api/apiService"
+
 import { IoMdClose } from "react-icons/io";
 import { IoSettingsOutline } from "react-icons/io5";
 import { BsPersonHeart } from "react-icons/bs";
@@ -7,12 +11,19 @@ import { MdOutlineSecurity } from "react-icons/md";
 import { AuthContext } from '../api/AuthContext';
 import { IoIosArrowBack } from "react-icons/io";
 import { IoClose } from "react-icons/io5";
-import { changeUserInfo, updatePersonalInfo, deleteConvos, deleteUserAccount } from "../api/apiService"
+import { FaUserCircle } from "react-icons/fa";
+
+
+
 
 const Settings = ( { onClose, isSettingsVisible } ) => {
+
   const [activeTab, setActiveTab] = useState('General'); // State to track active tab
   const { user, token, updateUser, logout } = useContext(AuthContext);
   const [message, setMessage] = useState("");
+
+  const { setCurrentConversation, setCurrentMessages, setConversationList } = useContext(ConversationContext);
+  const navigate = useNavigate();
 
   const [editUsername, setEditUsername] = useState(false);
   const [editEmail, setEditEmail] = useState(false);
@@ -30,6 +41,48 @@ const Settings = ( { onClose, isSettingsVisible } ) => {
   const [deleteChats, setDeleteChats] = useState(false);
   const [deleteAccount, setDeleteAccount] = useState(false);
 
+  const [file, setFile] = useState(null);
+  const [imageSrc, setImageSrc] = useState(null);
+
+  const MAX_SIZE_MB = 2; // Maximum file size in MB
+  const MAX_DIMENSION = 400; // Max width/height
+
+  const handleFileChange = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    // Validate file size (convert bytes to MB)
+    if (file.size > MAX_SIZE_MB * 1024 * 1024) {
+      alert("File size exceeds the 1MB limit!");
+      return;
+    }
+
+    // Validate file type
+    const validTypes = ["image/jpeg", "image/png", "image/svg+xml"];
+    if (!validTypes.includes(file.type)) {
+      alert("Invalid file type. Please upload a PNG, JPG, or SVG file.");
+      return;
+    }
+
+    // Read the file as a data URL
+    const reader = new FileReader();
+    reader.onload = () => setImageSrc(reader.result);
+    reader.readAsDataURL(file);
+
+    setFile(file);
+  };
+
+  const handleImageUpload = async (e) => {
+    try {
+        const response = await uploadImage(file, token);
+        console.log("Image uploaded successfully:", response);
+        alert("Image uploaded successfully!");
+        updateUser(response)
+      } catch (error) {
+        alert("Failed to upload image. Please try again.");
+      }
+    };
+
   const handleInputChange = (e) => {
     const value = e.target.value;
 
@@ -43,10 +96,15 @@ const Settings = ( { onClose, isSettingsVisible } ) => {
     try {
         // Call the changeUserInfo function with the new username
         console.log(user);  // Log current user
+        
         const deleted = await deleteConvos(token);
 
         console.log('Chat data deleted successfully!');
-        setMessage(`${deleted.deleted_conversations_count} conversations and ${deleted.deleted_messages_count} messages deleted!`);
+        setMessage(`${deleted.deleted_conversations_count} convos and ${deleted.deleted_messages_count} messages deleted!`);
+        setCurrentConversation(null)
+        setCurrentMessages([])
+        setConversationList([])
+        navigate('/')
 
         // Optionally, you can update the UI or show a success message
     } catch (err) {
@@ -182,6 +240,9 @@ const Settings = ( { onClose, isSettingsVisible } ) => {
     setDeleteChats(false)
     setDeleteAccount(false)
 
+    setFile(null)
+    setImageSrc(null)
+
     resetSelectedValues()
     }, [activeTab, onClose]);
   
@@ -222,8 +283,47 @@ const Settings = ( { onClose, isSettingsVisible } ) => {
             <div className='flex flex-col w-full gap-3 px-4 pb-2 text-sm text-token-text-primary justify-between'>
                 
                 <div className="border-b border-gray-500/60 pb-3">
-                    <div className="flex items-center justify-between">
-                    {editUsername ? (
+                    <div className="border-b border-gray-500/60 pb-3">
+                    <label 
+                        className="block mb-2 ml-1 text-sm font-sm text-gray-300" 
+                        htmlFor="file_input"
+                        >
+                        Upload Profile Pic
+                        </label>
+                        <div className='flex flex-row items-center pt-1 gap-3'>
+                            {user.image_url ? (
+                            <img
+                                src={user.image_url}
+                                className="object-cover rounded-full h-12 w-12 flex-shrink-0"
+                                alt="Profile"
+                            />
+                            ) : (
+                            <FaUserCircle size={30} />
+                            )}
+                            <input
+                            className="block w-full h-full file:p-3 text-xs rounded-lg text-gray-400 bg-gray-500/60 file:rounded-l-lg file:text-white file:bg-[#121212] file:border-none file:cursor-pointer cursor-pointer"
+                            aria-describedby="file_input_help"
+                            id="file_input"
+                            type="file"
+                            onChange={handleFileChange}
+                            />
+                        </div>
+                        <div className='flex flex-row items-center justify-between pt-3'>
+                            <p className="mt-2 text-xs ml-1 text-gray-300" id="file_input_help">
+                            SVG, PNG, or JPG (MAX. 1mb).
+                            </p>
+                            <button
+                                className="btn relative btn-secondary shrink-0 pr-1"
+                                onClick={handleImageUpload}
+                            >
+                                <div className="flex items-center hover:bg-gray-500 py-2 px-3 border border-gray-500 rounded-full justify-center">
+                                    Upload
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+                        <div className="flex items-center pt-3 justify-between">
+                        {editUsername ? (
                         <div className='flex flex-col items-center justify-center'>
                             <div className='flex flex-row items-center justify-center gap-4'>
                             {/* Arrow button to go back */}

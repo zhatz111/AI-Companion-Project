@@ -1,6 +1,6 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useContext } from 'react';
 import Message from './Message';
-import { BsArrowsCollapseVertical } from "react-icons/bs";
+import { ConversationContext } from '../api/ConversationContext';
 
 // Function to calculate relative time
 function calculateRelativeTime(timestamp) {
@@ -8,10 +8,6 @@ function calculateRelativeTime(timestamp) {
   const now = new Date().getTime();
   const time = new Date(utcTimestamp).getTime(); // Automatically parses as UTC if "Z" is present
   const diffInSeconds = Math.floor((now - time) / 1000);
-  console.log(now)
-  console.log(time)
-  console.log(timestamp)
-  console.log((now - time))
 
   if (diffInSeconds < 60) return 'Just now';
   if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)} min`;
@@ -30,25 +26,20 @@ function addRelativeTimeToMessages(messages) {
 }
 
 const MessageList = ({ item, messages }) => {
+  const { currentMessages } = useContext(ConversationContext);
   const [refreshedMessages, setRefreshedMessages] = useState([]);
   const messagesEndRef = useRef(null); // Ref to track the end of the messages list
 
-  // Scroll to the bottom of the messages container
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth", block: "end", inline: "nearest" });
-  };
-
-  // When the messages prop changes, update the refreshedMessages state
+  // Update messages with relative time whenever the `messages` prop changes
   useEffect(() => {
-    // Append relative time to each message whenever messages change
     setRefreshedMessages(addRelativeTimeToMessages(messages));
-  }, [messages]); // Only rerun when messages change
+  }, [messages]);
 
+  // Update relative time every minute
   useEffect(() => {
-    // Update relative time every minute, no need to reset entire messages
     const interval = setInterval(() => {
-      setRefreshedMessages((prevMessages) => 
-        prevMessages.map((message) => ({
+      setRefreshedMessages((prevMessages) =>
+        prevMessages.map((message) => ({ 
           ...message,
           relativeTime: calculateRelativeTime(message.time_created),
         }))
@@ -56,10 +47,10 @@ const MessageList = ({ item, messages }) => {
     }, 60000); // Refresh every minute
 
     return () => clearInterval(interval); // Cleanup on unmount
-  }, []); // Only run once on mount
+  }, []);
 
   return (
-    <div className="message-list-container">
+    <>
       {refreshedMessages.map((message) => (
         <Message
           key={message.id}
@@ -69,8 +60,9 @@ const MessageList = ({ item, messages }) => {
           sender={message.sender}
         />
       ))}
-    </div>
+    </>
   );
 };
 
 export default MessageList;
+

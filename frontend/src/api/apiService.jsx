@@ -42,9 +42,28 @@ export const getUserData = async (token) => {
     return response.data;
   };
 
-export const checkConversation = async (username, aiCharacter, token) => {
+export const listConversation = async (email, aiCharacter, token) => {
     // Ensure parameters are URL-encoded to handle any special characters
-    const url = `${API_BASE_URL}/api/check_conversation?user=${encodeURIComponent(username)}&ai_character=${encodeURIComponent(aiCharacter)}`;
+    const url = `${API_BASE_URL}/api/check_conversation?user=${encodeURIComponent(email)}&ai_character=${encodeURIComponent(aiCharacter)}`;
+    
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+      // mode: 'no-cors', // Bypasses CORS
+    });
+
+    if (response.status === 404) return null; // No conversation exists
+    if (!response.ok) {
+      throw new Error('Failed to check conversation');
+    }
+    return response.data;
+  };
+
+export const checkConversation = async (email, aiCharacter, token) => {
+    // Ensure parameters are URL-encoded to handle any special characters
+    const url = `${API_BASE_URL}/api/check_conversation?user=${encodeURIComponent(email)}&ai_character=${encodeURIComponent(aiCharacter)}`;
     
     const response = await fetch(url, {
       method: 'GET',
@@ -73,7 +92,6 @@ export const createConversation = async (conversationData, token) => {
           'Authorization': `Bearer ${token}`, // Token for user authentication
         },
         body: JSON.stringify(conversationData.ai_character), // Pass only ai_character here
-        // mode: 'no-cors', // Bypasses CORS
       });
 
       if (!response.ok) {
@@ -411,6 +429,26 @@ export const deleteUserAccount = async (token) => {
   } catch (error) {
     console.error('Error deleting account:', error);
     throw error;
+  }
+};
+
+export const uploadImage = async (file, token) => {
+  // Create FormData to send the file
+  const formData = new FormData();
+  formData.append('file', file);
+
+  try {
+    const response = await axios.post(`${API_BASE_URL}/api/save-image-content`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+
+    return response.data; // Return the response data
+  } catch (error) {
+    console.error("Error uploading image:", error);
+    throw error; // Propagate the error for further handling
   }
 };
   

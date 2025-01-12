@@ -99,6 +99,7 @@ target/
 *.exe
 *.mp3
 *.mp4
+*.ai
 chromedriver
 
 # node modules

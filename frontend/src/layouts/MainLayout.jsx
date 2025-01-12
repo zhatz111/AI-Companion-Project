@@ -19,7 +19,7 @@ const MainLayout = ({ children }) => {
     };
 
     return (
-        <div className="flex overflow-y-auto bg-[#212121]">
+        <div className="flex overflow-y-auto scrollbar bg-[#212121]">
             <TopBar
                 isOpen={isOpen}
                 setOpen={setOpen}

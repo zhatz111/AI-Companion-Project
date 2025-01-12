@@ -1,11 +1,13 @@
 # Standard Imports
 import os
-import json
 import secrets
+import hashlib
+import traceback
 from typing import Optional, List, Annotated, Dict
 from datetime import datetime, timedelta, timezone
 
 # Third Party Imports
+import boto3
 import bcrypt
 from openai import OpenAI
 from bson import ObjectId
@@ -17,10 +19,11 @@ from pydantic import BaseModel, EmailStr, Field
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi_mail import FastMail, MessageSchema, ConnectionConfig
 from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
-from fastapi import FastAPI, HTTPException, status, Request, Depends, Body, Query, Form
+from fastapi import FastAPI, HTTPException, status, UploadFile, Depends, Body, Query, Form, File
 
 # Load in all env variables
 load_dotenv()
+
 
 # FASTAPI APP WITH ENDPOINTS
 app = FastAPI()
@@ -54,21 +57,48 @@ messages_collection = db["messages"]
 password_resets_collection = db["password_resets"]
 feedback_collection = db["feedback"]
 
+# AWS S3 Configuration
+AWS_ACCESS_KEY = os.getenv("AWS_ACCESS_KEY")
+AWS_SECRET_KEY = os.getenv("AWS_SECRET_KEY")
+BUCKET_NAME = "sweetauraimages"
+s3_client = boto3.client(
+    's3',
+    aws_access_key_id=AWS_ACCESS_KEY,
+    aws_secret_access_key=AWS_SECRET_KEY
+)
+
+
 # Indexes for easier query
 conversations_collection.create_index("username")
 messages_collection.create_index([("conversation_id", 1), ("time_created", 1)])
 
 
 # OpenAI Configuration
+# client = OpenAI(
+#     base_url="https://api.studio.nebius.ai/v1/", api_key=os.getenv("NEBIUS_API_KEY")
+# )
+
+# client = OpenAI(
+#     base_url="https://api.aimlapi.com/v1", api_key=os.getenv("AIML_API_KEY")
+# )
+
+# client = OpenAI(
+#     base_url="https://api.mistral.ai/v1", api_key=os.getenv("MISTRAL_API_KEY")
+# )
+
+# client = OpenAI(
+#     base_url="https://api.arliai.com/v1", api_key=os.getenv("ARLI_API_KEY")
+# )
+
 client = OpenAI(
-    base_url="https://api.studio.nebius.ai/v1/", api_key=os.getenv("NEBIUS_API_KEY")
+    base_url="https://api.together.xyz/v1", api_key=os.getenv("TOGETHER_API_KEY")
 )
 
 # Security configuration
 SECRET_KEY = os.getenv("SECRET_KEY")  # Replace with a strong secret key
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30  # 15 minutes
-REFRESH_TOKEN_EXPIRE_DAYS = 7  # 7 days
+ACCESS_TOKEN_EXPIRE_MINUTES = 180  # minutes
+REFRESH_TOKEN_EXPIRE_DAYS = 7  # days
 
 # OAuth2 scheme
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/login")
@@ -79,12 +109,16 @@ class User(BaseModel):
     username: str
     email: EmailStr
     password: str = Field(..., min_length=6)
-
+    confirm_password: str = Field(..., min_length=6)
 
 class UserInDB(BaseModel):
     username: str
     email: EmailStr
     hashed_password: str
+    enabled: bool = True
+    signed_up: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    last_login: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    confirmed_email: bool = True
     id: Optional[str] = None
     age: Optional[int] = None
     height_feet: Optional[int] = None
@@ -94,6 +128,10 @@ class UserInDB(BaseModel):
     identity: Optional[str] = None
     sexuality: Optional[str] = None
     politics: Optional[str] = None
+    filename: Optional[str] = None
+    content_type: Optional[str] = None
+    image_url: Optional[str] = None
+    image_hash: Optional[str] = None
 
 
 class Token(BaseModel):
@@ -104,7 +142,7 @@ class Token(BaseModel):
 
 class Conversation(BaseModel):
     id: str  # MongoDB ObjectId or UUID
-    username: str  # username or email of person
+    email: EmailStr  # username or email of person
     ai_character: str  # name of the AI character
     created_at: datetime = Field(
         default_factory=lambda: datetime.now(timezone.utc)
@@ -117,6 +155,7 @@ class Conversation(BaseModel):
 class Message(BaseModel):
     id: str  # MongoDB ObjectId or UUID
     sender: str  # Username or ID of the sender
+    role: str # role specification for llm post request
     content: str  # Message content
     time_created: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     conversation_id: str  # ID of the associated conversation
@@ -344,16 +383,30 @@ async def send_feedback_confirmation(email: EmailStr):
 
 # ROUTES
 
-
 @app.post("/api/register", response_model=Token)
 async def register(user: User):
+
     if users_collection.find_one({"email": user.email}):
         raise HTTPException(status_code=400, detail="Email already registered")
+    
+    if users_collection.find_one({"username": user.username}):
+        raise HTTPException(status_code=400, detail="Username already registered")
+
+    if user.password != user.confirm_password:
+        raise HTTPException(status_code=400, detail="Passwords do not match!")
 
     hashed_password = hash_password(user.password)
 
     new_user = {**user.model_dump(), "hashed_password": hashed_password}
     del new_user["password"]
+    del new_user["confirmed_password"]
+
+    new_user["enabled"] = True
+    new_user["signed_up"] = datetime.now(timezone.utc)
+    new_user["last_login"] = datetime.now(timezone.utc)
+    new_user["confirmed_email"] = True
+
+    print(new_user)
 
     users_collection.insert_one(new_user)
     access_token = create_access_token(data={"sub": user.email})  # Use email in token
@@ -366,12 +419,12 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     if not user:
         raise HTTPException(status_code=400, detail="Incorrect username or password")
 
-    print(
-        f"Login attempt for: {form_data.username}, Stored Hash: {user.hashed_password}"
-    )  # Debug print
-
     if not verify_password(form_data.password, user.hashed_password):
         raise HTTPException(status_code=400, detail="Incorrect username or password")
+    
+    users_collection.find_one_and_update(
+        {"email": user.email}, {"$set": {"last_login": datetime.now(timezone.utc)}}
+    )
 
     access_token = create_access_token(data={"sub": user.email})
     refresh_token = create_refresh_token(data={"sub": user.email})
@@ -404,7 +457,7 @@ async def create_conversation(
     Create a new conversation with specified participants.
     """
     conversation = {
-        "username": user.username,
+        "email": user.email,
         "ai_character": ai_character,
         "created_at": datetime.now(timezone.utc),
     }
@@ -415,38 +468,39 @@ async def create_conversation(
 
 
 @app.get("/api/conversations", response_model=List[Conversation])
-async def list_conversations(username: str = Depends(get_current_user)):
+async def list_conversations(user: UserInDB = Depends(get_current_user)):
     """
     List all conversations for a specific participant.
     """
-    conversations = list(
-        conversations_collection.find({"username": username}).sort("created_at", -1)
-    )
+    conversations = conversations_collection.find({"email": user.email}).sort("created_at", -1)
     for conversation in conversations:
         conversation["id"] = str(conversation["_id"])
     return [Conversation(**conv) for conv in conversations]
 
 
-@app.get("/api/check_conversation", response_model=Conversation)
+@app.get("/api/check_conversation", response_model=List[Conversation])
 async def check_conversation(
     user: UserInDB = Depends(get_current_user), ai_character: str = Query(...)
 ):
     """
     Check if a conversation exists for a specific user and AI character.
     """
-    conversation = conversations_collection.find_one(
+    conversations = conversations_collection.find(
         {
-            "username": user.username,  # Use user.username instead of the whole UserInDB object
+            "email": user.email,
             "ai_character": ai_character,
         }
-    )
+    ).sort("created_at", -1)
 
-    if not conversation:
+    # Convert MongoDB cursor to a list
+    conversations_list = list(conversations)
+
+    if not conversations_list:
         # Return a 404 response if no conversation is found
-        raise HTTPException(status_code=404, detail="Conversation not found")
-    # Convert MongoDB ObjectId to string
-    conversation["id"] = str(conversation["_id"])
-    return Conversation(**conversation)
+        raise HTTPException(status_code=404, detail="Conversations not found")
+
+    # Convert MongoDB ObjectId to string and construct Conversation objects
+    return [Conversation(**{**conv, "id": str(conv["_id"])}) for conv in conversations_list]
 
 
 @app.post("/api/messages", response_model=Message)
@@ -465,6 +519,7 @@ async def send_message(
 
     message = {
         "sender": sender.username,
+        "role": "user",
         "content": content,
         "time_created": datetime.now(timezone.utc),
         "conversation_id": conversation_id,
@@ -483,6 +538,7 @@ async def get_messages(
     """
     Retrieve all messages in a specific conversation.
     """
+    # even if no messages return empty list for frontend
     messages = list(
         messages_collection.find({"conversation_id": conversation_id})
         .sort("time_created", 1)
@@ -491,12 +547,13 @@ async def get_messages(
     )
     for message in messages:
         message["id"] = str(message["_id"])
+
     return [Message(**msg) for msg in messages]
 
 
 @app.post("/generate-response", response_model=Message)
 async def generate_response(
-    content: str = Body(...),
+    content: list = Body(...),
     conversation_id: str = Body(...),
     ai_character: str = Body(...),
     system_prompt: str = Body(...),
@@ -516,26 +573,27 @@ async def generate_response(
         _type_: _description_
     """
     try:
+        system_prompt = [{"role": "system", "content": system_prompt}]  # System message setting context
+        extracted_messages = [{"role": message["role"], "content": message["content"]} for message in content] # "content": {"type": "text", "text": message["content"]}
+        message_list = system_prompt + extracted_messages
+        print(message_list)
+
         completion = client.chat.completions.create(
-            model="mistralai/Mixtral-8x7B-Instruct-v0.1-fast",  # "mistralai/Mistral-Nemo-Instruct-2407",
-            messages=[
-                {
-                    "role": "system",
-                    "content": system_prompt,
-                },  # System message setting context
-                {"role": "user", "content": content},  # User message
-            ],
-            temperature=0.6,
+            model="NousResearch/Nous-Hermes-2-Mixtral-8x7B-DPO",  # "mistralai/Mistral-Nemo-Instruct-2407", "mistralai/Mixtral-8x7B-Instruct-v0.1-fast"
+            messages=message_list,
+            temperature=0.4,
             max_tokens=512,
-            top_p=0.9,
+            top_p=0.1,
         )
 
-        response = completion.to_json()
-        response_dict = json.loads(response)
+        # Parse the response JSON
+        response_dict = completion.to_dict()
+        print(response_dict)
 
         # Create the AI-generated message
         ai_message = {
             "sender": ai_character,
+            "role": "assistant",
             "content": response_dict["choices"][0]["message"]["content"],
             "time_created": datetime.now(timezone.utc),
             "conversation_id": conversation_id,
@@ -548,6 +606,7 @@ async def generate_response(
 
     except Exception as e:
         # Handle potential errors
+        print(traceback.format_exc())
         raise HTTPException(
             status_code=500, detail=f"Error generating response: {str(e)}"
         ) from e
@@ -698,13 +757,9 @@ async def refresh_token_validation(refresh_token: str = Depends(oauth2_scheme)):
 
     # Validate the refresh token (you may need to implement validate_refresh_token)
     try:
-        print("did i make it this far???")
-        print(refresh_token)
         payload = validate_refresh_token(
             refresh_token
         )  # Assuming this function validates the refresh token
-        print("this is the payload")
-        print(payload)
         # Create a new access token
         new_access_token = create_access_token(data={"sub": payload["sub"]})
 
@@ -869,7 +924,7 @@ async def delete_chats(user: UserInDB = Depends(get_current_user)):
 
     try:
         # Fetch all conversations for the current user by username
-        conversations = list(conversations_collection.find({"username": user.username}))
+        conversations = list(conversations_collection.find({"email": user.email}))
 
         # Check if there are any conversations to delete
         if not conversations:
@@ -887,7 +942,7 @@ async def delete_chats(user: UserInDB = Depends(get_current_user)):
 
         # Delete the conversations
         result_conversations = conversations_collection.delete_many(
-            {"username": user.username}
+            {"email": user.email}
         )
 
         # Check how many documents were deleted
@@ -918,7 +973,7 @@ async def delete_account(user: UserInDB = Depends(get_current_user)):
     print(user)
     try:
         # Check if the user has any conversations
-        conversations = list(conversations_collection.find({"username": user.username}))
+        conversations = list(conversations_collection.find({"email": user.email}))
         print(conversations)
 
         if conversations:
@@ -930,7 +985,7 @@ async def delete_account(user: UserInDB = Depends(get_current_user)):
                 {"conversation_id": {"$in": conversations_ids}}
             )
             delete_conversations_result = conversations_collection.delete_many(
-                {"username": user.username}
+                {"email": user.email}
             )
             # Ensure all delete operations were successful
             if (
@@ -950,3 +1005,67 @@ async def delete_account(user: UserInDB = Depends(get_current_user)):
         raise HTTPException(
             status_code=500, detail=f"An unexpected error occurred: {str(e)}"
         ) from e
+
+
+
+@app.post("/api/save-image-content", response_model=UserInDB)
+async def save_image(
+    file: UploadFile = File(...),
+    user: UserInDB = Depends(get_current_user)
+):
+    try:
+        # Read the file content
+        content = await file.read()
+
+        # Compute a hash of the image content
+        file_hash = hashlib.sha256(content).hexdigest()
+
+        # Generate a unique key for the file based on the hash
+        file_key = f"profile_pictures/{file_hash}_{file.filename}"
+
+        # Check if the file already exists in S3
+        try:
+            s3_client.head_object(Bucket=BUCKET_NAME, Key=file_key)
+            s3_url = f"https://{BUCKET_NAME}.s3.amazonaws.com/{file_key}"
+            print("File already exists in S3.")
+        except s3_client.exceptions.ClientError as e:
+            if e.response['Error']['Code'] == '404':
+                # If the file does not exist, upload it
+                s3_client.put_object(
+                    Bucket=BUCKET_NAME,
+                    Key=file_key,
+                    Body=content,
+                    ContentType=file.content_type,
+                )
+                s3_url = f"https://{BUCKET_NAME}.s3.amazonaws.com/{file_key}"
+                print("File uploaded to S3.")
+            else:
+                raise HTTPException(status_code=500, detail=f'Error checking file in S3: {str(e)}') from e
+
+        # Find the user document in the collection by email
+        record = users_collection.find_one({"email": user.email})
+        if record:
+            # Update the user's document with the S3 URL
+            result = users_collection.find_one_and_update(
+                {"email": user.email},  # Find the document by email
+                {
+                    "$set": {  # Use the $set operator to update the fields
+                        "filename": file.filename,
+                        "content_type": file.content_type,
+                        "image_url": s3_url,  # Store the S3 URL in MongoDB
+                        "image_hash": file_hash  # Optionally store the hash for future checks
+                    }
+                },
+                return_document=True  # Return the updated document
+            )
+
+            if result:
+                # Return updated user document
+                return UserInDB(**result)
+
+            raise HTTPException(status_code=500, detail="Failed to update user data")
+
+        raise HTTPException(status_code=404, detail="User not found")
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f'Failed to save image: {str(e)}') from e

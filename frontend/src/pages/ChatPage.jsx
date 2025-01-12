@@ -4,7 +4,7 @@ import { useParams } from 'react-router-dom';
 import MessageList from '../components/MessageList';
 import ChatInput from '../components/ChatInput';
 import MessageProfile from '../components/MessageProfile';
-import { BsArrowsCollapseVertical } from "react-icons/bs";
+import ConversationList from '../components/ConversationList';
 
 import { AuthContext } from "../api/AuthContext";
 import { ConversationContext } from '../api/ConversationContext';
@@ -16,100 +16,144 @@ const ChatPage = () => {
     const { itemId } = useParams();
     const { user, token } = useContext(AuthContext);
     const [loading, setLoading] = useState(true);
-    const [isCollapsed, setIsCollapsed] = useState(false);
+    const [isConvoCollapsed, setIsConvoCollapsed] = useState(false);
+    const [isProfileCollapsed, setIsProfileCollapsed] = useState(false);
+    const isFetchingConversation = useRef(false);
 
-    const { getOrCreateConversation, currentConversation, loadMessages, sendMessage, currentMessages } = useContext(ConversationContext);
+    const {
+        // getOrCreateConversation,
+        getConversations, 
+        createNewConversation, 
+        currentConversation, 
+        loadMessages, 
+        sendMessage, 
+        currentMessages, 
+        conversationList,
+        setConversationList,
+        setCurrentConversation,
+        setCurrentMessages
+    } = useContext(ConversationContext);
+
     const { characters, currentCharacter } = useContext(CharacterContext);
 
-    const messagesEndRef = useRef(null); // Ref for scrolling
-
-    // Scroll to the bottom when messages update
     useEffect(() => {
-        const scrollToBottom = () => {
-            if (messagesEndRef.current) {
-                messagesEndRef.current.scrollIntoView({ behavior: "smooth", block: "end", inline: "nearest" });
+        setCurrentConversation(null)
+        setCurrentMessages([])
+        setConversationList([])
+        const fetchConversations = async () => {
+            
+            if (!token || !user || isFetchingConversation.current) {
+                setLoading(false);
+                return;
             }
-        };
-        scrollToBottom();
-    }, [currentMessages]); // Trigger when `currentMessages` changes
-
-    // Memoize the conversation fetch logic and handle localStorage
-    useEffect(() => {
-        const fetchConversation = async () => {
-            if (!token || !user) {
-                setLoading(false); // Ensure loading stops if not authenticated
-            }
-
-            setLoading(true); // Set loading to true when fetching starts
-
+    
+            isFetchingConversation.current = true; // Prevent multiple calls
+            setLoading(true);
+    
             try {
-                // Check if a conversation exists in localStorage
-                let conversation = JSON.parse(localStorage.getItem('currentConversation'));
-                if (!conversation || conversation.itemId !== itemId) {
-                    // Fetch new conversation if not in localStorage or itemId doesn't match
-                    conversation = await getOrCreateConversation(itemId);
-                    // Save the new conversation to localStorage
-                    localStorage.setItem('currentConversation', JSON.stringify(conversation));
+                // Fetch existing conversations
+                const conversations = await getConversations(itemId);
+                if (!conversations || conversations.length === 0) {
+                    // If no conversations exist, create a new one
+                    const newConversation = await createNewConversation(itemId);
+                    localStorage.setItem('currentConversations', JSON.stringify([newConversation]));
+                    console.log("Created new conversation:", newConversation);
+                } else {
+                    localStorage.setItem('currentConversations', JSON.stringify(conversations));
+                    console.log("Fetched conversations:", conversations);
                 }
-
-                console.log("Fetched conversation:", conversation);
             } catch (error) {
-                console.error("Error fetching conversation:", error);
+                console.error("Error fetching or creating conversation:", error);
             } finally {
-                setLoading(false); // Mark loading as complete
+                setLoading(false);
+                isFetchingConversation.current = false; // Allow future calls
             }
         };
+    
+        fetchConversations();
+    }, [itemId, token, user]);
+    
 
-        fetchConversation();
-    }, [itemId, token, user, getOrCreateConversation]);
+    // useEffect(() => {
+    //     const fetchMessages = async () => {
+    //         if (currentConversation?.id) {
+    //             setLoading(true);
+    //             try {
+    //                 const messagesData = await loadMessages();
+    //                 setMessages(messagesData);
+    //             } catch (error) {
+    //                 console.error('Error fetching messages:', error);
+    //             } finally {
+    //                 setLoading(false);
+    //             }
+    //         }
+    //     };
 
-    useEffect(() => {
-        const fetchMessages = async () => {
-            if (currentConversation?.id) {
-                setLoading(true);
-                try {
-                    const messagesData = await loadMessages();
-                    setMessages(messagesData);
-                } catch (error) {
-                    console.error('Error fetching messages:', error);
-                } finally {
-                    setLoading(false);
-                }
-            }
-        };
-
-        if (currentConversation?.id) fetchMessages();
-    }, [currentConversation?.id, token]);
+    //     if (currentConversation?.id) fetchMessages();
+    // }, [currentConversation?.id, token]);
 
     const handleSendMessage = async (newMessage) => {
         await sendMessage(currentConversation.id, newMessage);
         setNewMessage(''); // Clear input after sending
     };
 
-    return (
-        <>
-            {currentCharacter ? (
-                <div className="flex h-screen overflow-y-auto">
-                    <div className={` ${isCollapsed ? 'w-0' : 'w-100'} flex flex-col max-w-mm sm:max-w-sm lg:max-w-md xl:max-w-lg overflow-y-auto scrollbar duration-500`}>
-                        <MessageProfile isCollapsed={isCollapsed} item={currentCharacter} />
-                    </div>
+    // const handleRefreshConversations = async () => {
+    //     // This will trigger a refetch of conversations
+    //     const refreshedConversations = await getOrCreateConversation(itemId); // Or any identifier for the conversation
+    //     console.log('Refreshed conversations:', refreshedConversations);
+    // };
 
-                    <div className={`flex flex-col ${isCollapsed ? 'flex-grow' : 'flex-1'} max-h-screen pb-2 mt-auto bg-[#212121] transition-all duration-500`}>
-                        <div className="p-4 mt-16 pb-10 overflow-y-auto scrollbar">
-                            <MessageList item={currentCharacter} messages={currentMessages} />
-                            {/* Ref element for auto-scrolling */}
-                            <div ref={messagesEndRef} />
-                        </div>
-                        <div className="sticky bottom-0 bg-[#212121] p-4">
-                            <ChatInput item={currentCharacter} onSendMessage={handleSendMessage} onClick={() => setIsCollapsed(!isCollapsed)} />
-                        </div>
-                    </div>
+    return (
+        <div className="flex h-screen">
+        {currentCharacter ? (
+            <div className="flex flex-row justify-evenly items-stretch h-full w-full">
+            {/* Message Profile - Sidebar Left */}
+            <div
+                className={`${
+                isConvoCollapsed ? 'hidden' : 'flex'
+                } flex-[2] flex-col max-w-xs lg:max-w-sm bg-[#1e1e1e] overflow-y-auto scrollbar transition-all duration-500 border-r border-[#FF6FCF]`}
+            >
+                <ConversationList isCollapsed={isConvoCollapsed} item={itemId} />
+            </div>
+
+            {/* Chat Message - Main Content */}
+            <div
+                className={`flex flex-col flex-[4] ${
+                isConvoCollapsed ? 'w-full' : ''
+                } max-h-screen bg-[#212121] transition-all duration-500`}
+            >
+                {/* Scrollable Message List */}
+                <div className="p-2 mt-16 mb-2 mx-6 flex-1 overflow-y-auto scrollbar">
+                <MessageList item={currentCharacter} messages={currentMessages} />
                 </div>
-            ) : (
-                <p>Page item is not present</p>
-            )}
-        </>
+
+                {/* Sticky Chat Input */}
+                <div className="bg-[#212121] py-4">
+                <ChatInput
+                    item={currentCharacter}
+                    onSendMessage={handleSendMessage}
+                    onClickConvo={() => setIsConvoCollapsed(!isConvoCollapsed)}
+                    onClickProfile={() => setIsProfileCollapsed(!isProfileCollapsed)}
+                />
+                </div>
+            </div>
+
+            {/* Message Profile - Sidebar Right */}
+            <div
+                className={`${
+                isProfileCollapsed ? 'hidden' : 'flex'
+                } flex-[2] flex-col max-w-xs lg:max-w-sm bg-[#1e1e1e] overflow-y-auto scrollbar transition-all duration-500`}
+            >
+                <MessageProfile isCollapsed={isProfileCollapsed} item={currentCharacter} />
+            </div>
+            </div>
+        ) : (
+            <p>Page item is not present</p>
+        )}
+        </div>
+
     );
+    
 };
 
 export default ChatPage;

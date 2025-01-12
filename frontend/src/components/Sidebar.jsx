@@ -70,27 +70,32 @@ const Sidebar = ({ isOpen, onLoginClick, onSettingsClick }) => {
       onClick: onSettingsClick
     }
 
+    const loginbutton = {
+      icons: <FaUserCircle size={30} />,
+      label: 'Login',
+      onClick: onLoginClick
+    }
+
   return (
     <nav
     className={`fixed top-0 left-0 shadow-md border-r border-[#FF6FCF] pt-20 bottom-0 z-40 p-6 flex flex-col transition-width duration-500 ease-in-out bg-[#121212] text-white ${
-      isOpen ? 'w-60' : 'w-24'
-    }`}
-  >
+        isOpen ? 'w-60' : 'w-24'
+      }`}
+    >
 
     {/* Body */}
     <ul className="flex-1">
     {menuItems.map((item, index) => (
       <div key={index} className="cursor-pointer">
         <SidebarItem 
-          isOpen={isOpen} 
-          item={item} 
+          isOpen={isOpen}
+          item={item}
           index={index}
           route={item.route} // Assuming `link` is a property in the `item` object
           onClick={item.onClick}
         />
       </div>
     ))}
-
       {userData ? (
         <>
           <div onClick={onSettingsClick} className="cursor-pointer">
@@ -99,35 +104,50 @@ const Sidebar = ({ isOpen, onLoginClick, onSettingsClick }) => {
           {/* <div onClick={logout} className="cursor-pointer">
             <SidebarItem isOpen={isOpen} item={logoutButton} />
           </div> */}
+          
         </>
+      ) : (
+        <>
+        </>
+      )}
+      {/* <div className='flex-1'>
+        <SidebarItem isOpen={isOpen} item={loginbutton} />
+      </div> */}
+    </ul>
+
+    {/* Footer */}
+    <div className="flex cursor-pointer hover:underline group" onClick={onLoginClick}>
+      <div className='flex items-center'>
+      {userData?.image_url ? (
+        <div className='block w-12'>
+          <img
+              src={userData.image_url}
+              className="flex w-12 h-12 aspect-square rounded-full object-cover"
+              alt="Profile"
+          />
+        </div>
       ) : (
         <></>
       )}
-    </ul>
-
-
-    {/* Footer */}
-    <div className="flex cursor-pointer hover:underline items-center gap-2 px-3 py-2 group" onClick={onLoginClick}>
-      <div>
-        <FaUserCircle size={30} />
       </div>
-      <div
-        className={`${!isOpen && 'translate-x-8'} duration-500 overflow-hidden`}>
-        {userData ? (
-          <>
-            <p className="px-2">{userData.username}</p>
-            <span className="text-xs">
-              <p className="px-2">{userData.email}</p>
-            </span>
-          </>
-        ) : (
-          <>
-            <button className="group-hover:underline px-2">
-              Login
-            </button>
-          </>
-        )}
-      </div>
+
+    {/* Login button */}
+    <div
+      className={`${!isOpen && 'translate-x-8'} duration-500 overflow-hidden`}>
+      {userData ? (
+        <>
+          <p className="px-2">{userData.username}</p>
+          <span className="text-xs">
+            <p className="px-2">{userData.email}</p>
+          </span>
+        </>
+      ) : (
+        <div className='flex-1'>
+          {/* <SidebarItem isOpen={isOpen} item={loginbutton} /> */}
+        </div>
+      )}
+    </div>
+
     </div>
   </nav>
   )

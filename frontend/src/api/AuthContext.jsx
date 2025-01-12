@@ -20,13 +20,15 @@ export const AuthProvider = ({ children }) => {
       console.log(access_token)
       const userData = await getUserData(access_token);
 
+      setUser(userData);
       localStorage.setItem("user", JSON.stringify(userData));
+
+      setToken(access_token);
       localStorage.setItem("token", access_token);
+
+      setRefreshToken(refresh_token)
       localStorage.setItem('refresh_token', refresh_token);
 
-      setUser(userData);
-      setToken(access_token);
-      setRefreshToken(refresh_token)
     } catch (error) {
       console.error("Login error:", error.response?.data || error.message);
       if (error.response) {
@@ -37,11 +39,14 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = () => {
-    localStorage.removeItem("user");
-    localStorage.removeItem("token");
     setUser(null);
     setToken(null);
+    setRefreshToken(null);
+    localStorage.removeItem("user");
+    localStorage.removeItem("token");
+    localStorage.removeItem("refresh_token");
   };
+  
 
   const registerUser = async (username, email, password) => {
     try {
@@ -64,53 +69,58 @@ export const AuthProvider = ({ children }) => {
       try {
         const storedUser = localStorage.getItem("user");
         const storedToken = localStorage.getItem("token");
-        const storedRefreshToken = localStorage.getItem("refresh_token")
-
+        const storedRefreshToken = localStorage.getItem("refresh_token");
+  
         if (storedUser && storedToken && storedRefreshToken) {
+          const isValid = await validateToken(storedToken);
+          if (isValid) {
             setUser(JSON.parse(storedUser));
             setToken(storedToken);
-            setRefreshToken(storedRefreshToken)
-          
+            setRefreshToken(storedRefreshToken);
+          } else {
+            const { success, access_token } = await validateRefreshToken(storedRefreshToken);
+            if (success) {
+              setToken(access_token);
+              localStorage.setItem("token", access_token);
+            } else {
+              logout();
+            }
+          }
         }
       } catch (error) {
         console.error("Error during token validation:", error);
         logout();
       }
     };
-
+  
+    // Call fetchUserInfo immediately
     fetchUserInfo();
-
+  
     // Periodic token validation
     const interval = setInterval(async () => {
-      if (token) {
-        try {
-
+      try {
+        if (token) {
           const isValid = await validateToken(token);
           if (!isValid) {
             const { success, access_token } = await validateRefreshToken(refreshToken);
-
-            if (!success) {
-              // If token is invalid, log out the user
-              console.warn("Token expired during session. Logging out...");
-              logout();
+            if (success) {
+              setToken(access_token);
+              localStorage.setItem("token", access_token);
             } else {
-              // If the refresh token is valid, store the new access token
-              console.log("New access token received.");
-              localStorage.setItem("token", access_token); // Save the new access token in localStorage
-              setToken(access_token)
-              // Optionally, you can also update any other state related to the user or token
+              logout();
             }
-
+          }
         }
-        } catch (error) {
-          console.error("Error during periodic token validation:", error);
-          logout();
-        }
+      } catch (error) {
+        console.error("Error during periodic validation:", error);
+        logout();
       }
-    }, 30 * 60 * 1000); // Validate every 5 minutes
-
-    return () => clearInterval(interval); // Cleanup interval on unmount
-  }, [token]);
+    }, 10 * 60 * 1000); // Validate every 10 minutes
+  
+    // Cleanup interval on unmount
+    return () => clearInterval(interval);
+  }, [token, refreshToken]);
+  
 
   return (
     <AuthContext.Provider value={{ user, token, login, logout, registerUser, updateUser }}>
