@@ -393,6 +393,33 @@ export const updatePersonalInfo = async (
   };
 
   // Function to delete chats
+export const deleteConversation = async (conversationID, token) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/delete-chat/${conversationID}`, {
+          method: 'DELETE',
+          headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`,
+          },
+      });
+
+      if (response.ok) {
+          // Optionally, update the UI or notify the user
+          console.log('Chat deleted successfully');
+          // Update the ConversationContext or remove the chat from the list
+          // Example: remove the chat from the state
+      } else {
+          const error = await response.json();
+          console.error('Error deleting chat:', error.detail);
+          alert('Failed to delete chat');
+      }
+  } catch (error) {
+      console.error('Unexpected error:', error);
+      alert('An unexpected error occurred');
+  }
+  };
+
+  // Function to delete chats
 export const deleteConvos = async (token) => {
     try {
       // Make the DELETE request to the API

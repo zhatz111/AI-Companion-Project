@@ -16,6 +16,10 @@ const App = () => {
             element={ <HomePage type="female"/> }
           />
           <Route
+            path="/verify-email"
+            element={ <HomePage type="female"/> }
+          />
+          <Route
             path="/ai-dogs"
             element={ <HomePage type="male"/> }
           />

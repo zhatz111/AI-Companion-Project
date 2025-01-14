@@ -1,11 +1,13 @@
 import React, { useContext, useState } from 'react'
 import { ConversationContext } from '../api/ConversationContext';
 
-const Conversation = ({ currConversation, isActive }) => {
+const Conversation = ({ currConversation, isActive, onDelete }) => {
     const handleClick = () => {
         setCurrentConversation(currConversation); // Call your existing function
         setCurrentMessages(currConversation.messages)
       };
+    
+    
 
     // Input datetime string from Python
     const pythonDateString = currConversation.created_at;
@@ -44,16 +46,38 @@ const Conversation = ({ currConversation, isActive }) => {
 
   return (
     <div
-      className={`rounded-xl cursor-pointer p-3 text-nowrap w-full max-w-sm ${
+      className={`flex flex-row rounded-xl cursor-pointer p-3 text-nowrap w-full max-w-sm ${
         isActive ? "bg-gray-800/60 border" : "bg-gray-800/60" // Highlight active, default others
       } hover:bg-gray-500`}
       onClick={handleClick}
     >
       <div className="w-full flex flex-col justify-center">
         <h1 className="text-white text-sm pb-2">{finalOutput}</h1>
-        <p className="text-gray-300 text-sm">
-          {currConversation.messages[currConversation.messages.length - 1]?.content?.slice(0, 35)}
+        <p className="text-gray-400 text-sm">
+          {currConversation.messages[currConversation.messages.length - 1]?.content?.slice(0, 35) || "New Chat"}
         </p>
+      </div>
+      <div className='flex p-2'>
+        <button
+          onClick={onDelete} // Trigger the delete when clicked
+          className="inline-flex items-center px-2 py-2 bg-red-600/60 transition ease-in-out delay-75 hover:bg-red-700 text-white text-sm font-medium rounded-md hover:-translate-y-1 hover:scale-110"
+          disabled={!isActive}
+        >
+          <svg
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            fill="none"
+            className="h-5 w-5"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+              strokeWidth="2"
+              strokeLinejoin="round"
+              strokeLinecap="round"
+            ></path>
+          </svg>
+        </button>
       </div>
     </div>
   )

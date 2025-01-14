@@ -59,10 +59,10 @@ const Sidebar = ({ isOpen, onLoginClick, onSettingsClick }) => {
         }
       ]
     
-    const logoutButton = {
-      icons: <MdLogout size={30} />,
-      label: 'Logout'
-    }
+    // const logoutButton = {
+    //   icons: <MdLogout size={30} />,
+    //   label: 'Logout'
+    // }
 
     const settingbutton = {
       icons: <CiSettings size={30} />,
@@ -70,11 +70,11 @@ const Sidebar = ({ isOpen, onLoginClick, onSettingsClick }) => {
       onClick: onSettingsClick
     }
 
-    const loginbutton = {
-      icons: <FaUserCircle size={30} />,
-      label: 'Login',
-      onClick: onLoginClick
-    }
+    // const loginbutton = {
+    //   icons: <FaUserCircle size={30} />,
+    //   label: 'Login',
+    //   onClick: onLoginClick
+    // }
 
   return (
     <nav
@@ -116,7 +116,7 @@ const Sidebar = ({ isOpen, onLoginClick, onSettingsClick }) => {
     </ul>
 
     {/* Footer */}
-    <div className="flex cursor-pointer hover:underline group" onClick={onLoginClick}>
+    <div className="flex cursor-pointer hover:underline group" onClick={onSettingsClick}>
       <div className='flex items-center'>
       {userData?.image_url ? (
         <div className='block w-12'>
@@ -142,8 +142,7 @@ const Sidebar = ({ isOpen, onLoginClick, onSettingsClick }) => {
           </span>
         </>
       ) : (
-        <div className='flex-1'>
-          {/* <SidebarItem isOpen={isOpen} item={loginbutton} /> */}
+        <div>
         </div>
       )}
     </div>

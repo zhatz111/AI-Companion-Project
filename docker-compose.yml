@@ -1,45 +1,19 @@
-version: "3.9"
 
 services:
   frontend:
     build:
       context: ./frontend
-      dockerfile: Dockerfile
     ports:
-      - "3000:3000"
-    stdin_open: true
-    tty: true
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
-    depends_on:
-      - backend
-    environment:
-      VITE_API_URL: "http://localhost:8000" # Adjust as needed
+      - "3000:80"
+    env_file:
+      - .env
 
   backend:
     build:
       context: ./backend
-      dockerfile: Dockerfile
     ports:
       - "8000:8000"
-    volumes:
-      - ./backend:/app
-    depends_on:
-      - mongodb
     env_file:
-      - ./.env
+      - .env
     environment:
-      MONGO_URI: "mongodb+srv://${USERNAME}:${PASSWORD}@${MONGO_CLUSTER}/?retryWrites=true&w=majority&appName=SweetAura"
-
-
-  mongodb:
-    image: mongo:latest
-    container_name: mongodb
-    ports:
-      - "27017:27017"
-    volumes:
-      - mongo_data:/data/db
-
-volumes:
-  mongo_data:
+      - DATABASE_URL=${MONGODB_URI}  # Optional for explicit mapping

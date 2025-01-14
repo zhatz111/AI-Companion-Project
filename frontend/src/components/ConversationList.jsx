@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import Conversation from "./Conversation";
 import { AuthContext } from "../api/AuthContext";
 import { ConversationContext } from "../api/ConversationContext";
+import { deleteConversation } from '../api/apiService'
 
 const ConversationList = ({ item }) => {
     const { token } = useContext(AuthContext);
@@ -11,6 +12,7 @@ const ConversationList = ({ item }) => {
         setCurrentConversation,
         setCurrentMessages,
         createNewConversation,
+        setConversationList,
     } = useContext(ConversationContext);
 
     const [searchTerm, setSearchTerm] = useState(""); // State for search term
@@ -22,7 +24,7 @@ const ConversationList = ({ item }) => {
             setCurrentConversation(conversationList[0]);
             setCurrentMessages(conversationList[0].messages);
         }
-    }, [conversationList, setCurrentConversation, setCurrentMessages]);
+    }, [filteredConversations, setCurrentConversation, setCurrentMessages]);
 
     // Update filtered conversations based on search term
     useEffect(() => {
@@ -43,19 +45,47 @@ const ConversationList = ({ item }) => {
     }, [searchTerm, conversationList]);
 
     const handleClick = () => {
-        createNewConversation(item, token);
+        // Check if the conversation already exists in the list
+        const existingConversation = conversationList.some(
+            (conversation) => conversation.id === item.id
+        );
+    
+        // Only create a new conversation if it doesn't already exist
+        if (!existingConversation) {
+            createNewConversation(item, token);
+        } else {
+            console.log("Conversation already exists");
+        }
+    };
+
+    const handleDelete = async () => {
+        try {
+            // Delete the conversation from the backend
+            await deleteConversation(currentConversation.id, token);
+    
+            // Update the frontend state to remove the conversation from the list
+            const updatedConversations = conversationList.filter(
+                (conversation) => conversation.id !== currentConversation.id
+            );
+            setConversationList(updatedConversations)
+            // Update the state with the new list of conversations
+            setFilteredConversations(updatedConversations);
+
+        } catch (error) {
+            console.error("Error deleting conversation:", error);
+        }
     };
 
     return (
-        <div className="mt-16 p-4 ">
+        <div className="flex-[2] mt-16 p-4">
             {/* Search Form */}
-            <div className="flex flex-row gap-2 items-center justify-center">
+            <div className="flex gap-2 items-center justify-center">
                 <div className="flex">
                     <form
                         className="form relative"
                         onSubmit={(e) => e.preventDefault()} // Prevent form submission
                     >
-                        <button className="absolute left-2 -translate-y-1/2 top-1/2 p-1">
+                        {/* <button className="absolute left-2 -translate-y-1/2 top-1/2 p-1">
                             <svg
                                 width="17"
                                 height="16"
@@ -73,15 +103,16 @@ const ConversationList = ({ item }) => {
                                     strokeLinejoin="round"
                                 ></path>
                             </svg>
-                        </button>
+                        </button> */}
                         <input
-                            className="flex rounded-full px-8 py-3 text-white text-sm border-2 border-transparent bg-black focus:outline-none focus:border-[#FF6FCF] placeholder-gray-400 transition-all duration-300 shadow-md"
+                            className=" rounded-full px-8 py-3 text-white text-sm border-2 border-transparent bg-black focus:outline-none focus:border-[#FF6FCF] placeholder-gray-400 transition-all duration-300 shadow-lg"
                             placeholder="Search..."
                             required
                             type="text"
                             value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)} // Update search term
+                            onChange={(e) => setSearchTerm(e.target.value)}
                         />
+
                         <button
                             type="reset"
                             className="absolute right-3 -translate-y-1/2 top-1/2 p-1"
@@ -107,7 +138,7 @@ const ConversationList = ({ item }) => {
                 <div className="flex">
                     <button
                         title="Add New"
-                        className="group cursor-pointer outline-none hover:rotate-90 duration-300"
+                        className="flex group cursor-pointer outline-none hover:rotate-90 duration-300"
                         onClick={handleClick}
                     >
                         <svg
@@ -115,7 +146,7 @@ const ConversationList = ({ item }) => {
                             width="40px"
                             height="40px"
                             viewBox="0 0 24 24"
-                            className="stroke-pink-400 fill-none group-hover:fill-pink-800 group-active:stroke-pink-200 group-active:fill-pink-600 group-active:duration-0 duration-300"
+                            className="w-6 h-6 md:w-10 md:h-10 lg:w-12 lg:h-12 stroke-pink-400 fill-none group-hover:fill-pink-800 group-active:stroke-pink-200 group-active:fill-pink-600 group-active:duration-0 duration-300"
                         >
                             <path
                                 d="M12 22C17.5 22 22 17.5 22 12C22 6.5 17.5 2 12 2C6.5 2 2 6.5 2 12C2 17.5 6.5 22 12 22Z"
@@ -136,6 +167,7 @@ const ConversationList = ({ item }) => {
                         currConversation={conversation}
                         isActive={currentConversation?.id === conversation.id}
                         setCurrentConversation={setCurrentConversation}
+                        onDelete={handleDelete}
                     />
                 ))}
             </div>

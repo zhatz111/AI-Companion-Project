@@ -1,28 +1,67 @@
 # Standard Imports
-import os
 import secrets
 import hashlib
 import traceback
-from typing import Optional, List, Annotated, Dict
+from typing import Optional, List, Annotated
 from datetime import datetime, timedelta, timezone
 
 # Third Party Imports
-import boto3
-import bcrypt
-from openai import OpenAI
 from bson import ObjectId
-from dotenv import load_dotenv
-from jose import JWTError, jwt
-from pymongo import MongoClient
-from pydantic_settings import BaseSettings
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import EmailStr
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi_mail import FastMail, MessageSchema, ConnectionConfig
-from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
-from fastapi import FastAPI, HTTPException, status, UploadFile, Depends, Body, Query, Form, File
+from fastapi.security import OAuth2PasswordRequestForm
+from fastapi import (
+    FastAPI,
+    HTTPException,
+    status,
+    UploadFile,
+    Depends,
+    Body,
+    Query,
+    Form,
+    File,
+)
 
-# Load in all env variables
-load_dotenv()
+# Local Imports
+# pylint: disable=import-error
+from templates.email_templates import (
+    send_reset_email,
+    send_verify_email,
+    send_feedback_confirmation,
+)
+from schemas.schema import (
+    User,
+    UserInDB,
+    Token,
+    Conversation,
+    Message,
+    ResetPassword,
+    FeedbackForm,
+)
+from core.utility_functions import (
+    hash_password,
+    verify_password,
+    create_access_token,
+    create_refresh_token,
+    validate_access_token,
+    validate_refresh_token,
+    get_user,
+    get_current_user,
+    oauth2_scheme,
+)
+from core.database import (
+    users_collection,
+    conversations_collection,
+    messages_collection,
+    password_resets_collection,
+    feedback_collection,
+    s3_client,
+    BUCKET_NAME,
+    open_AI_client,
+)
+
+
+# -----------------------------------------------------------------
 
 
 # FASTAPI APP WITH ENDPOINTS
@@ -42,353 +81,15 @@ app.add_middleware(
     allow_headers=["*"],  # Allow all headers
 )
 
-# MONGODB
-
-# MongoDB configuration
-USERNAME = os.getenv("USERNAME")
-PASSWORD = os.getenv("PASSWORD")
-MONGODB_URI = f"mongodb+srv://{USERNAME}:{PASSWORD}@sweetaura.znm4c.mongodb.net/?retryWrites=true&w=majority&appName=SweetAura"
-PORT = 8000
-client = MongoClient(MONGODB_URI, PORT)
-db = client["auth_db"]
-users_collection = db["users"]
-conversations_collection = db["conversations"]
-messages_collection = db["messages"]
-password_resets_collection = db["password_resets"]
-feedback_collection = db["feedback"]
-
-# AWS S3 Configuration
-AWS_ACCESS_KEY = os.getenv("AWS_ACCESS_KEY")
-AWS_SECRET_KEY = os.getenv("AWS_SECRET_KEY")
-BUCKET_NAME = "sweetauraimages"
-s3_client = boto3.client(
-    's3',
-    aws_access_key_id=AWS_ACCESS_KEY,
-    aws_secret_access_key=AWS_SECRET_KEY
-)
-
-
-# Indexes for easier query
-conversations_collection.create_index("username")
-messages_collection.create_index([("conversation_id", 1), ("time_created", 1)])
-
-
-# OpenAI Configuration
-# client = OpenAI(
-#     base_url="https://api.studio.nebius.ai/v1/", api_key=os.getenv("NEBIUS_API_KEY")
-# )
-
-# client = OpenAI(
-#     base_url="https://api.aimlapi.com/v1", api_key=os.getenv("AIML_API_KEY")
-# )
-
-# client = OpenAI(
-#     base_url="https://api.mistral.ai/v1", api_key=os.getenv("MISTRAL_API_KEY")
-# )
-
-# client = OpenAI(
-#     base_url="https://api.arliai.com/v1", api_key=os.getenv("ARLI_API_KEY")
-# )
-
-client = OpenAI(
-    base_url="https://api.together.xyz/v1", api_key=os.getenv("TOGETHER_API_KEY")
-)
-
-# Security configuration
-SECRET_KEY = os.getenv("SECRET_KEY")  # Replace with a strong secret key
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 180  # minutes
-REFRESH_TOKEN_EXPIRE_DAYS = 7  # days
-
-# OAuth2 scheme
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/login")
-
-
-# Pydantic models
-class User(BaseModel):
-    username: str
-    email: EmailStr
-    password: str = Field(..., min_length=6)
-    confirm_password: str = Field(..., min_length=6)
-
-class UserInDB(BaseModel):
-    username: str
-    email: EmailStr
-    hashed_password: str
-    enabled: bool = True
-    signed_up: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
-    last_login: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
-    confirmed_email: bool = True
-    id: Optional[str] = None
-    age: Optional[int] = None
-    height_feet: Optional[int] = None
-    height_inches: Optional[int] = None
-    weight: Optional[int] = None
-    gender: Optional[str] = None
-    identity: Optional[str] = None
-    sexuality: Optional[str] = None
-    politics: Optional[str] = None
-    filename: Optional[str] = None
-    content_type: Optional[str] = None
-    image_url: Optional[str] = None
-    image_hash: Optional[str] = None
-
-
-class Token(BaseModel):
-    access_token: str
-    refresh_token: str
-    token_type: str
-
-
-class Conversation(BaseModel):
-    id: str  # MongoDB ObjectId or UUID
-    email: EmailStr  # username or email of person
-    ai_character: str  # name of the AI character
-    created_at: datetime = Field(
-        default_factory=lambda: datetime.now(timezone.utc)
-    )  # Timestamp for when the conversation was created
-
-    class Config:
-        json_encoders = {ObjectId: str}  # Serialize MongoDB ObjectId
-
-
-class Message(BaseModel):
-    id: str  # MongoDB ObjectId or UUID
-    sender: str  # Username or ID of the sender
-    role: str # role specification for llm post request
-    content: str  # Message content
-    time_created: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
-    conversation_id: str  # ID of the associated conversation
-
-    class Config:
-        json_encoders = {ObjectId: str}  # Serialize MongoDB ObjectId
-
-
-class ResetPassword(BaseModel):
-    email: EmailStr
-    hashed_token: str
-    expiration_time: datetime = Field(
-        default_factory=lambda: datetime.now(timezone.utc)
-    )
-    reset_time: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
-
-
-class FeedbackForm(BaseModel):
-    email: EmailStr
-    subject: str = Field(..., min_length=1, max_length=100)
-    message: str = Field(..., min_length=1, max_length=1000)
-    valid_user: bool = (False,)
-    feedback_time: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
-
-
-# Configuration settings
-class EmailConfig(BaseSettings):
-    MAIL_USERNAME: str
-    MAIL_PASSWORD: str
-    MAIL_FROM: EmailStr
-    MAIL_PORT: int
-    MAIL_SERVER: str
-    MAIL_STARTTLS: bool = True
-    MAIL_SSL_TLS: bool = False
-    MAIL_FROM_NAME: str = "SweetAura"
-
-    class Config:
-        env_file = ".env"  # Use a .env file for sensitive information
-
-
-# Load configuration
-email_config = EmailConfig()
-
-conf = ConnectionConfig(
-    MAIL_USERNAME=email_config.MAIL_USERNAME,
-    MAIL_PASSWORD=email_config.MAIL_PASSWORD,
-    MAIL_FROM=email_config.MAIL_FROM,
-    MAIL_PORT=email_config.MAIL_PORT,
-    MAIL_SERVER=email_config.MAIL_SERVER,
-    MAIL_STARTTLS=email_config.MAIL_STARTTLS,
-    MAIL_SSL_TLS=email_config.MAIL_SSL_TLS,
-    MAIL_FROM_NAME=email_config.MAIL_FROM_NAME,
-)
-
-
-# UTILITY FUNCTIONS
-
-
-# Hash a password
-def hash_password(password: str) -> str:
-    salt = bcrypt.gensalt()
-    hashed_password = bcrypt.hashpw(password.encode("utf-8"), salt)
-    return hashed_password.decode("utf-8")
-
-
-# Verify a password
-def verify_password(plain_password: str, hashed_password: str) -> bool:
-    return bcrypt.checkpw(
-        plain_password.encode("utf-8"), hashed_password.encode("utf-8")
-    )
-
-
-def create_access_token(data: dict, expires_delta: timedelta | None = None) -> str:
-    to_encode = data.copy()
-    expire = datetime.now(timezone.utc) + (
-        expires_delta or timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    )
-    to_encode.update({"exp": expire})
-    return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
-
-
-def create_refresh_token(data: dict, expires_delta: timedelta | None = None) -> str:
-    to_encode = data.copy()
-    expire = datetime.now(timezone.utc) + (
-        expires_delta or timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS)
-    )
-    to_encode.update({"exp": expire})
-    return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
-
-
-def validate_access_token(token: str) -> Dict:
-    """
-    Validates the JWT token.
-    - Decodes the token and checks the expiration.
-    - Returns the payload if valid.
-    """
-    try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        # Check expiration
-        if payload.get("exp") and datetime.fromtimestamp(
-            payload["exp"], tz=timezone.utc
-        ) < datetime.now(timezone.utc):
-            raise HTTPException(status_code=401, detail="Token has expired")
-        return payload
-    except JWTError as e:
-        raise HTTPException(status_code=401, detail="Invalid token") from e
-
-
-def validate_refresh_token(refresh_token: str):
-    try:
-        payload = jwt.decode(refresh_token, SECRET_KEY, algorithms=[ALGORITHM])
-        return payload
-    except JWTError as exc:
-        raise HTTPException(
-            status_code=401, detail="Invalid or expired refresh token"
-        ) from exc
-
-
-def get_user(email: str) -> UserInDB | None:
-    user = users_collection.find_one({"email": email})
-    if user:
-        # MongoDB adds an `_id` field by default, which is not part of your UserInDB model
-        user.pop("_id", None)
-        return UserInDB(**user)
-    return None
-
-
-# Verify token utility
-def get_current_user(token: str = Depends(oauth2_scheme)) -> UserInDB:
-    try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=ALGORITHM)
-        email: str = payload.get("sub")
-        if email is None:
-            raise HTTPException(status_code=401, detail="Invalid credentials")
-        user = get_user(email)
-        if user is None:
-            raise HTTPException(status_code=401, detail="Invalid credentials")
-        return user
-    except JWTError as exc:
-        raise HTTPException(status_code=401, detail="Invalid credentials") from exc
-
-
-async def send_reset_email(email: EmailStr, token: str):
-    """
-    Sends a password reset email with a reset link to the user.
-
-    Args:
-        email (str): The recipient's email address.
-        token (str): The unique password reset token.
-
-    Returns:
-        None
-    """
-    reset_link = f"http://localhost:3000/reset-password?token={token}"
-
-    subject = "Password Reset Request"
-    body = f"""
-    Hi,
-
-    We received a request to reset your password. Use the link below to reset your password:
-    {reset_link}
-
-    If you did not request a password reset, please ignore this email.
-
-    Thanks,
-    Your App Team
-    """
-    html_body = f"""
-    <html>
-        <body>
-            <p>Hi,</p>
-            <p>We received a request to reset your password. Click the link below to reset your password:</p>
-            <a href="{reset_link}">Reset Password</a>
-            <p>If you did not request a password reset, please ignore this email.</p>
-            <p>Thanks,<br>Your App Team</p>
-        </body>
-    </html>
-    """
-
-    message = MessageSchema(
-        subject=subject,
-        recipients=[email],  # List of recipients
-        body=html_body,
-        subtype="html",  # Send HTML content
-    )
-
-    fastmail = FastMail(conf)
-
-    try:
-        await fastmail.send_message(message)
-        print(f"Password reset email sent to {email}")
-    except Exception as e:
-        print(f"Error sending email: {e}")
-
-
-async def send_feedback_confirmation(email: EmailStr):
-    """
-    Sends a password reset email with a reset link to the user.
-
-    Args:
-        email (str): The recipient's email address.
-        token (str): The unique password reset token.
-
-    Returns:
-        None
-    """
-
-    message = MessageSchema(
-        subject="Feedback Received",
-        recipients=[email],
-        body="Thank you for reaching out to us! We've received your feedback and will respond shortly.",
-        subtype="plain",
-    )
-
-    fastmail = FastMail(conf)
-
-    try:
-        await fastmail.send_message(message)
-        print(f"Confirmation Email sent to: {email}")
-    except Exception as e:
-        print(f"Error sending confirmation email: {e}")
-
-
-# -----------------------------------------------------------------
-
 # ROUTES
+
 
 @app.post("/api/register", response_model=Token)
 async def register(user: User):
 
     if users_collection.find_one({"email": user.email}):
         raise HTTPException(status_code=400, detail="Email already registered")
-    
+
     if users_collection.find_one({"username": user.username}):
         raise HTTPException(status_code=400, detail="Username already registered")
 
@@ -410,7 +111,47 @@ async def register(user: User):
 
     users_collection.insert_one(new_user)
     access_token = create_access_token(data={"sub": user.email})  # Use email in token
+    verification_token = create_access_token(
+        data={"sub": user.email}, expires_delta=15
+    )  # Use email in token
+
+    await send_verify_email(user.email, verification_token)
+
     return {"access_token": access_token, "token_type": "bearer"}
+
+
+@app.post("/api/verify-email", response_model=UserInDB)
+async def verify_email(
+    token: Annotated[str, Form()],
+):
+    try:
+        # Validate the token and extract the payload
+        payload = validate_access_token(token=token)
+        if "sub" not in payload or not payload["sub"]:
+            raise HTTPException(status_code=400, detail="Invalid token payload")
+
+        email = payload["sub"]
+
+        # Find the user by email
+        user = users_collection.find_one({"email": email})
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+
+        # Update the user's email verification status
+        updated_user = users_collection.find_one_and_update(
+            {"email": email},
+            {"$set": {"confirmed_email": True}},
+        )
+
+        if not updated_user:
+            raise HTTPException(
+                status_code=500, detail="Failed to update user verification status"
+            )
+
+        return UserInDB(**updated_user)
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e)) from e
 
 
 @app.post("/api/login", response_model=Token)
@@ -421,7 +162,7 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
 
     if not verify_password(form_data.password, user.hashed_password):
         raise HTTPException(status_code=400, detail="Incorrect username or password")
-    
+
     users_collection.find_one_and_update(
         {"email": user.email}, {"$set": {"last_login": datetime.now(timezone.utc)}}
     )
@@ -472,7 +213,9 @@ async def list_conversations(user: UserInDB = Depends(get_current_user)):
     """
     List all conversations for a specific participant.
     """
-    conversations = conversations_collection.find({"email": user.email}).sort("created_at", -1)
+    conversations = conversations_collection.find({"email": user.email}).sort(
+        "created_at", -1
+    )
     for conversation in conversations:
         conversation["id"] = str(conversation["_id"])
     return [Conversation(**conv) for conv in conversations]
@@ -500,7 +243,9 @@ async def check_conversation(
         raise HTTPException(status_code=404, detail="Conversations not found")
 
     # Convert MongoDB ObjectId to string and construct Conversation objects
-    return [Conversation(**{**conv, "id": str(conv["_id"])}) for conv in conversations_list]
+    return [
+        Conversation(**{**conv, "id": str(conv["_id"])}) for conv in conversations_list
+    ]
 
 
 @app.post("/api/messages", response_model=Message)
@@ -573,12 +318,17 @@ async def generate_response(
         _type_: _description_
     """
     try:
-        system_prompt = [{"role": "system", "content": system_prompt}]  # System message setting context
-        extracted_messages = [{"role": message["role"], "content": message["content"]} for message in content] # "content": {"type": "text", "text": message["content"]}
+        system_prompt = [
+            {"role": "system", "content": system_prompt}
+        ]  # System message setting context
+        extracted_messages = [
+            {"role": message["role"], "content": message["content"]}
+            for message in content
+        ]  # "content": {"type": "text", "text": message["content"]}
         message_list = system_prompt + extracted_messages
         print(message_list)
 
-        completion = client.chat.completions.create(
+        completion = open_AI_client.chat.completions.create(
             model="NousResearch/Nous-Hermes-2-Mixtral-8x7B-DPO",  # "mistralai/Mistral-Nemo-Instruct-2407", "mistralai/Mixtral-8x7B-Instruct-v0.1-fast"
             messages=message_list,
             temperature=0.4,
@@ -644,7 +394,7 @@ async def forgot_password(email: Annotated[str, Form()]):
     password_resets_collection.insert_one(reset_data)
 
     # Send the token via email
-    await send_reset_email(email, token)
+    await send_reset_email(user["username"], email, token)
 
     return ResetPassword(**reset_data)
 
@@ -664,7 +414,6 @@ async def reset_password(
         )
 
     # Validate the token
-    print(token)
     reset_request = password_resets_collection.find_one({"hashed_token": token})
     if not reset_request:
         raise HTTPException(status_code=404, detail="Password reset request not found")
@@ -919,6 +668,28 @@ async def change_personal_info(
         ) from e
 
 
+@app.delete("/api/delete-chat/{conversation_id}")
+async def delete_chat(conversation_id: str, _: UserInDB = Depends(get_current_user)):
+    try:
+        # Ensure the conversation_id is a valid ObjectId
+        if not ObjectId.is_valid(conversation_id):
+            raise HTTPException(status_code=400, detail="Invalid conversation ID format")
+
+        # Delete the conversation
+        result = conversations_collection.delete_one({"_id": ObjectId(conversation_id)})
+
+        if result.deleted_count == 0:
+            raise HTTPException(status_code=404, detail="Conversation not found")
+
+        # Return a success message
+        return {"message": "Chat deleted successfully!"}
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, detail=f"An unexpected error occurred: {str(e)}"
+        ) from e
+
+
 @app.delete("/api/delete-chats")
 async def delete_chats(user: UserInDB = Depends(get_current_user)):
 
@@ -978,7 +749,9 @@ async def delete_account(user: UserInDB = Depends(get_current_user)):
 
         if conversations:
             # Extract conversation IDs to delete associated messages and conversations
-            conversations_ids = [str(conversation["_id"]) for conversation in conversations]
+            conversations_ids = [
+                str(conversation["_id"]) for conversation in conversations
+            ]
             print(conversations_ids)
             # Perform all delete operations in one go for efficiency
             delete_messages_result = messages_collection.delete_many(
@@ -1007,11 +780,9 @@ async def delete_account(user: UserInDB = Depends(get_current_user)):
         ) from e
 
 
-
 @app.post("/api/save-image-content", response_model=UserInDB)
 async def save_image(
-    file: UploadFile = File(...),
-    user: UserInDB = Depends(get_current_user)
+    file: UploadFile = File(...), user: UserInDB = Depends(get_current_user)
 ):
     try:
         # Read the file content
@@ -1029,7 +800,7 @@ async def save_image(
             s3_url = f"https://{BUCKET_NAME}.s3.amazonaws.com/{file_key}"
             print("File already exists in S3.")
         except s3_client.exceptions.ClientError as e:
-            if e.response['Error']['Code'] == '404':
+            if e.response["Error"]["Code"] == "404":
                 # If the file does not exist, upload it
                 s3_client.put_object(
                     Bucket=BUCKET_NAME,
@@ -1040,7 +811,9 @@ async def save_image(
                 s3_url = f"https://{BUCKET_NAME}.s3.amazonaws.com/{file_key}"
                 print("File uploaded to S3.")
             else:
-                raise HTTPException(status_code=500, detail=f'Error checking file in S3: {str(e)}') from e
+                raise HTTPException(
+                    status_code=500, detail=f"Error checking file in S3: {str(e)}"
+                ) from e
 
         # Find the user document in the collection by email
         record = users_collection.find_one({"email": user.email})
@@ -1053,10 +826,10 @@ async def save_image(
                         "filename": file.filename,
                         "content_type": file.content_type,
                         "image_url": s3_url,  # Store the S3 URL in MongoDB
-                        "image_hash": file_hash  # Optionally store the hash for future checks
+                        "image_hash": file_hash,  # Optionally store the hash for future checks
                     }
                 },
-                return_document=True  # Return the updated document
+                return_document=True,  # Return the updated document
             )
 
             if result:
@@ -1068,4 +841,6 @@ async def save_image(
         raise HTTPException(status_code=404, detail="User not found")
 
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f'Failed to save image: {str(e)}') from e
+        raise HTTPException(
+            status_code=500, detail=f"Failed to save image: {str(e)}"
+        ) from e

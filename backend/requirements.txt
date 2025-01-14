@@ -1,0 +1,12 @@
+bcrypt==4.2.1
+boto3==1.35.94
+fastapi==0.115.6
+fastapi_mail==1.4.2
+openai==1.58.1
+pydantic==2.10.4
+pydantic_settings==2.7.1
+pymongo==4.10.1
+python-dotenv==1.0.1
+python_jose==3.3.0
+python-multipart==0.0.20
+uvicorn==0.34.0

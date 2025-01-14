@@ -22,12 +22,12 @@ const ChatPage = () => {
 
     const {
         // getOrCreateConversation,
-        getConversations, 
-        createNewConversation, 
-        currentConversation, 
-        loadMessages, 
-        sendMessage, 
-        currentMessages, 
+        getConversations,
+        createNewConversation,
+        currentConversation,
+        loadMessages,
+        sendMessage,
+        currentMessages,
         conversationList,
         setConversationList,
         setCurrentConversation,
@@ -72,46 +72,21 @@ const ChatPage = () => {
     
         fetchConversations();
     }, [itemId, token, user]);
-    
-
-    // useEffect(() => {
-    //     const fetchMessages = async () => {
-    //         if (currentConversation?.id) {
-    //             setLoading(true);
-    //             try {
-    //                 const messagesData = await loadMessages();
-    //                 setMessages(messagesData);
-    //             } catch (error) {
-    //                 console.error('Error fetching messages:', error);
-    //             } finally {
-    //                 setLoading(false);
-    //             }
-    //         }
-    //     };
-
-    //     if (currentConversation?.id) fetchMessages();
-    // }, [currentConversation?.id, token]);
 
     const handleSendMessage = async (newMessage) => {
         await sendMessage(currentConversation.id, newMessage);
         setNewMessage(''); // Clear input after sending
     };
 
-    // const handleRefreshConversations = async () => {
-    //     // This will trigger a refetch of conversations
-    //     const refreshedConversations = await getOrCreateConversation(itemId); // Or any identifier for the conversation
-    //     console.log('Refreshed conversations:', refreshedConversations);
-    // };
-
     return (
         <div className="flex h-screen">
         {currentCharacter ? (
-            <div className="flex flex-row justify-evenly items-stretch h-full w-full">
+            <div className="flex flex-row justify-evenly h-full w-full">
             {/* Message Profile - Sidebar Left */}
             <div
                 className={`${
                 isConvoCollapsed ? 'hidden' : 'flex'
-                } flex-[2] flex-col max-w-xs lg:max-w-sm bg-[#1e1e1e] overflow-y-auto scrollbar transition-all duration-500 border-r border-[#FF6FCF]`}
+                }  flex-col bg-[#1e1e1e] overflow-y-auto scrollbar border-r border-[#FF6FCF]`}
             >
                 <ConversationList isCollapsed={isConvoCollapsed} item={itemId} />
             </div>
