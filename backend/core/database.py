@@ -29,8 +29,8 @@ password_resets_collection = db["password_resets"]
 feedback_collection = db["feedback"]
 
 # Indexes for easier query
-conversations_collection.create_index("email")
-messages_collection.create_index([("conversation_id", 1), ("time_created", 1)])
+# conversations_collection.create_index("email")
+# messages_collection.create_index([("conversation_id", 1), ("time_created", 1)])
 
 # -------------------------------------------------------
 

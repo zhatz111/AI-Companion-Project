@@ -70,6 +70,7 @@ app = FastAPI()
 origins = [
     "http://localhost:3000",
     "http://192.168.1.169:3000",
+    "https://main.detj6d3vw2hc8.amplifyapp.com"
 ]
 
 # Add CORS middleware

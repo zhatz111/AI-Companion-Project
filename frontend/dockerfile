@@ -1,21 +1,5 @@
 # Dockerfile for React Vite App
-FROM node:18-alpine AS build
+FROM 221082201737.dkr.ecr.us-east-2.amazonaws.com/sweetaura_frontend:latest
 
-# Set working directory
-WORKDIR /app
-
-# Copy package.json and install dependencies
-COPY package.json package-lock.json ./
-RUN npm install
-
-# Copy source files and build
-COPY . .
-RUN npm run build
-
-# Serve the build with a lightweight server
-FROM nginx:alpine
-COPY --from=build /app/dist /usr/share/nginx/html
-
-# Expose port
-EXPOSE 80
+# Start nginx server
 CMD ["nginx", "-g", "daemon off;"]

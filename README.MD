@@ -60,3 +60,52 @@ export default {
 npm install
 npm run dev
 ```
+
+## Deploying my Web Application to AWS Elastic BeanStalk
+- Zip the directory to easily upload the folder for use with Docker and make sure to exclude installed package folders
+```bash
+zip -r sweetaura.zip . -x ".venv/*" "./frontend/node_modules/*" "misc/*"
+```
+
+- Dockerfile to deploy to AWS ECR for the frontend:
+```dockerfile
+# Dockerfile for React Vite App
+FROM node:18-alpine AS build
+
+# Set working directory
+WORKDIR /app
+
+# Copy package.json and install dependencies
+COPY package.json package-lock.json ./
+RUN npm install
+
+# Copy source files and build
+COPY . .
+RUN npm run build
+
+# Serve the build with a lightweight server
+FROM nginx:alpine
+COPY --from=build /app/dist /usr/share/nginx/html
+
+# Expose port
+EXPOSE 80
+```
+
+- Dockerfile to deploy to AWS ECR for the backend:
+```dockerfile
+# Dockerfile for FastAPI Backend
+FROM python:3.10-slim
+
+# Set working directory
+WORKDIR /app
+
+# Install dependencies
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy application code
+COPY . .
+
+# Expose port
+EXPOSE 8000
+```

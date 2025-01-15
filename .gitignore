@@ -5,6 +5,9 @@ __pycache__/
 # C extensions
 *.so
 
+# References
+misc/
+
 # Distribution / packaging
 .Python
 .venv/
@@ -60,6 +63,9 @@ target/
 # DotEnv configuration
 .env
 
+# AWS Security
+*.pem
+
 # Database
 *.db
 *.rdb
@@ -67,6 +73,7 @@ target/
 # Data
 *.csv
 *.log
+*.zip
 
 # Pycharm
 .idea
