@@ -50,7 +50,7 @@ const TopBar = ({ isOpen, setOpen, onLoginClick, onCreateClick }) => {
                         <Link to={"/"}>
                             <div
                                 onClick={() => handleClick(0)} // Set index 0 as active
-                                className={`hidden sm:block py-5 px-3 md:px-4 group cursor-pointer ${
+                                className={`hidden ml:block py-5 px-3 md:px-4 group cursor-pointer ${
                                     activeIndex === 0 ? "border-b-3 border-[#FF6FCF]" : ""
                                 }`}
                             >
@@ -67,7 +67,7 @@ const TopBar = ({ isOpen, setOpen, onLoginClick, onCreateClick }) => {
                         <Link to={"/ai-dogs"}>
                             <div
                                 onClick={() => handleClick(1)} // Set index 0 as active
-                                className={`hidden sm:block py-5 px-3 md:px-4 group cursor-pointer ${
+                                className={`hidden ml:block py-5 px-3 md:px-4 group cursor-pointer ${
                                     activeIndex === 1 ? "border-b-3 border-[#FF6FCF]" : ""
                                 }`}
                             >
@@ -84,7 +84,7 @@ const TopBar = ({ isOpen, setOpen, onLoginClick, onCreateClick }) => {
                         <Link to={"/ai-anime"}>
                             <div
                                 onClick={() => handleClick(2)} // Set index 0 as active
-                                className={`hidden sm:block py-5 px-3 md:px-4 group cursor-pointer ${
+                                className={`hidden ml:block py-5 px-3 md:px-4 group cursor-pointer ${
                                     activeIndex === 2 ? "border-b-3 border-[#FF6FCF]" : ""
                                 }`}
                             >
@@ -104,7 +104,7 @@ const TopBar = ({ isOpen, setOpen, onLoginClick, onCreateClick }) => {
                         <div className="flex space-x-2 py-2 px-4">
                             {!user ? (
                                 <div className='flex items-center justify-center gap-2'>
-                                    <div className="hidden md:block px-2 group">
+                                    <div className="hidden ml:block px-2 group">
                                         <button
                                         className="relative inline-block p-px font-semibold leading-6 text-white bg-gray-800/80 shadow-2xl cursor-pointer rounded-xl shadow-zinc-900 transition-transform duration-300 ease-in-out hover:scale-105 active:scale-95"
                                         onClick={onCreateClick}

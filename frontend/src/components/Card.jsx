@@ -24,15 +24,15 @@ const Card = ({ item, onClick }) => {
             </div>
             <figcaption className="absolute left-2 right-2 sm:left-6 sm:right-6 bottom-6 flex flex-col gap-2">
               <div className="flex gap-2">
-                <div className="text-sm text-left hidden sm:block border bg-[#FF6FCF]/60 text-nowrap hover:bg-[#FF6FCF] rounded-full px-2 text-white">{item.body_type}</div>
-                <div className="text-sm text-left hidden sm:block border bg-[#FF6FCF]/60 text-nowrap hover:bg-[#FF6FCF] rounded-full px-2 text-white">{item.race}</div>
+                <div className="text-sm text-left hidden md:block border bg-[#FF6FCF]/60 text-nowrap hover:bg-[#FF6FCF] rounded-full px-2 text-white">{item.body_type}</div>
+                <div className="text-sm text-left hidden md:block border bg-[#FF6FCF]/60 text-nowrap hover:bg-[#FF6FCF] rounded-full px-2 text-white">{item.race}</div>
               </div>
               <div className="flex gap-2">
-                <span className="text-base text-left sm:text-xl font-bold text-white">{firstName}</span>
-                <span className="text-base text-left sm:text-xl font-bold text-gray-300">{item.age}</span>
+                <span className="text-sm sm:text-base text-left md:text-xl font-bold text-white">{firstName}</span>
+                <span className="text-sm sm:text-base text-left md:text-xl font-bold text-gray-300">{item.age}</span>
               </div>
-              <p className="text-sm hidden sm:block sm:text-base text-left text-gray-400">{description.slice(0, 50)} ...</p>
-              <p className="text-xs sm:hidden block sm:text-base text-left text-gray-400">{description.slice(0, 20)} ...</p>
+              <p className="text-sm hidden md:block md:text-base text-left text-gray-400">{description.slice(0, 50)} ...</p>
+              {/* <p className="text-xs md:hidden block md:text-base text-left text-gray-400">{description.slice(0, 20)} ...</p> */}
             </figcaption>
             </Link>
         </figure>
