@@ -109,3 +109,136 @@ COPY . .
 # Expose port
 EXPOSE 8000
 ```
+
+## Deploying FastAPI Backend on AWS EC2 instance
+
+### Creating and Setting up an EC2 instance
+- Create an instance in AWS EC2. Preference is `Amazon Linux 2023` (free tier eligable) with `t2.micro` (free tier eligable).
+- Connect to the instance using either EC2 instance connect or SSH. Prefer to use SSH. SSH command for terminal: (Ensure you are in the directory where your key pair exists)
+```bash
+ssh -i "sweetaura_key_pair.pem" ec2-user@ec2-3-137-169-130.us-east-2.compute.amazonaws.com
+```
+- After connecting to your EC2 instance, it is necessary to update the system and install python 3.11 using the commands below:
+```bash
+# Update the system
+sudo yum update -y
+# Instal python 3.11
+sudo dnf install python3.11 -y
+# Install pip
+sudo dnf install python3.11-pip -y
+
+# Can check the python version to ensure it works
+python3.11 --version
+```
+- After installing python we need to copy the backend files from the local computer to the instance in terminal. This may be modified in the future to just clone the git repo so things can be pulled easier. Use the command below on your local computer (NOT EC2 instance) to copy the files:
+```bash
+# Copy all backend files to EC2 instance
+scp -i "sweetaura_key_pair.pem" -r ./backend ec2-user@ec2-3-137-169-130.us-east-2.compute.amazonaws.com:~/backend
+#  Check on EC2 instance that they were copied
+ls ~/backend
+
+# Copy the .env file to EC2 instance
+scp -i "sweetaura_key_pair.pem" -r .env ec2-user@ec2-3-137-169-130.us-east-2.compute.amazonaws.com:~/backend
+# Check to make sure the .env file was copied to the EC2 instance
+ls ~/backend/.env
+```
+- Create a virtual envirnoment in the backend folder with python
+```bash
+# Change directory to backend if not already in it
+cd backend/
+
+# Create virtual environment
+python3.11 -m venv venv
+
+# Activate the virtual environment
+source venv/bin/activate
+```
+- Install the requirements of the backend API app using the `requirements.txt` file:
+```bash
+# Install the required packages
+pip install -r requirements.txt
+
+# Upgrade pip if needed
+pip install --upgrade pip
+```
+- Test that the FastAPI app runs as expected using uvicorn
+```bash
+uvicorn main:app --host 0.0.0.0 --port 8000
+```
+### Accessing the backend and Setting up reverse Proxy with NGINX
+- You can access the backend with the Public IPv4 address, in my case `http://3.137.169.130:8000`
+  - In `Network and Security` go to `Security Groups` and find the security group for the EC2 instance and click on the ID.
+  - Click on `Edit inbound rules` and add a rule with `Type: Custom TCP`, `Port Range: 8000`, and `Source: 0.0.0.0/0`. This will open up port 8000 to all traffic so we can access it through the browser. It is important to not that this must be accessed using **http** rather than **https** since the server is not set up for **https** yet.
+- Reverse Proxy set-up using nginx and serving HTTPS on it:
+```bash
+# Install nginx
+sudo yum install nginx -y
+
+# Install Certbot for SSL Certificates (Let's Encrypt SSL)
+sudo yum install certbot python3-certbot-nginx -y
+
+# To obtain a wildcard SSL certificate use the DNS plugin for Spaceship
+pip install certbot-dns-spaceship
+
+# Obtain API and Secret key from Spaceship and create credentials file
+nano spaceship_credentials.ini
+
+# In the file enter this:
+[spaceship]
+api_key = your_api_key
+api_secret = your_api_secret
+
+# Secure the credentials file:
+chmod 600 spaceship_credentials.ini
+
+# Use Certbot to obtain and configure the SSL certificate, this requires you to have a domain name already:
+sudo certbot certonly \
+    --authenticator dns-spaceship \
+    --dns-spaceship-credentials /home/ec2-user/backend/spaceship_credentials.ini \
+    -d "*.sweetaura.ai" -d "sweetaura.ai" \
+    --debug-challenges
+
+```
+- After certbot runs correctly the result should have the following information:
+```bash
+# The result should have this information in it
+Certificate is saved at: /etc/letsencrypt/live/sweetaura.ai/fullchain.pem
+Key is saved at:         /etc/letsencrypt/live/sweetaura.ai/privkey.pem
+This certificate expires on 2025-04-15.
+```
+- Now we can edit the nginx config file and replace the `server` section with:
+```js
+# Redirect HTTP (port 80) to HTTPS (port 443)
+server {
+    listen 80;
+    server_name sweetaura.ai *.sweetaura.ai;
+
+    # Redirect all HTTP requests to HTTPS
+    return 301 https://$host$request_uri;
+}
+
+# Serve HTTPS (port 443) with SSL
+server {
+    listen 443 ssl;
+    server_name sweetaura.ai *.sweetaura.ai;
+
+    # SSL certificate and key files
+    ssl_certificate /etc/letsencrypt/live/sweetaura.ai/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/sweetaura.ai/privkey.pem;
+
+    # Location block to proxy requests to the backend
+    location / {
+        proxy_pass http://localhost:8000; # Backend server
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+    }
+}
+
+```
+- After editing the file make sure to save it with `Ctrl O` and exit out of it with `Ctrl X`
+- Restart the nginx server `sudo systemctl restart nginx` and then we can run the `uvicorn server`.
+  - The uvicorn server can be started normally because the reverse proxy will redirect traffic from https to the http server at port 8000.
+  - We can also edit the port configuration and take off port 8000 so users can not directly access that port, only the nginx port 80 can be accessed.
+```bash
+uvicorn main:app --host 0.0.0.0 --port 8000
+```
