@@ -4,14 +4,48 @@ import qs from "qs";
 const API_BASE_URL = "https://api.sweetaura.ai"; // Replace with your backend URL if different
 // http://localhost:8000
 
+import axios from 'axios';
+
 export const register = async (username, email, password) => {
-  const response = await axios.post(`${API_BASE_URL}/api/register`, {
-    username,
-    email,
-    password,
-  });
-  return response.data; // Contains the JWT token
+  try {
+    // Log the data being sent to the API
+    console.log('Registering user with the following data:', { username, email });
+
+    // Make the POST request to the API
+    const response = await axios.post(`${API_BASE_URL}/api/register`, {
+      username,
+      email,
+      password,
+    });
+
+    // Log the response data for debugging
+    console.log('API response:', response);
+
+    // Return the response data (JWT token or error message)
+    return response.data;
+  } catch (error) {
+    // Log error details for better debugging
+    console.error('Error during registration:', error);
+
+    // If the error is from Axios, log the details
+    if (error.response) {
+      // Server responded with a non-2xx status code
+      console.error('Error response data:', error.response.data);
+      console.error('Error response status:', error.response.status);
+      console.error('Error response headers:', error.response.headers);
+    } else if (error.request) {
+      // No response received from the server
+      console.error('Error request data:', error.request);
+    } else {
+      // General error in setting up the request
+      console.error('Error message:', error.message);
+    }
+
+    // Optionally, throw the error to be handled higher up (or show a user-friendly message)
+    throw new Error('Registration failed. Please try again later.');
+  }
 };
+
 
 export const login = async (email, password) => {
     const data = qs.stringify({
