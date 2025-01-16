@@ -15,7 +15,6 @@ const TopBar = ({ isOpen, setOpen, onLoginClick, onCreateClick }) => {
 
     // Automatically check the first 3 indexes and set activeIndex to 0 if all are null
     useEffect(() => {
-        console.log(route)
         if (route === "") {
             setActiveIndex(0); // Set index 0 as active if route is empty
         } else if (route === "ai-anime") {

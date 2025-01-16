@@ -87,7 +87,7 @@ app.add_middleware(
 
 @app.post("/api/register", response_model=Token)
 async def register(user: User):
-
+    print(user)
     if users_collection.find_one({"email": user.email}):
         raise HTTPException(status_code=400, detail="Email already registered")
 
@@ -101,12 +101,12 @@ async def register(user: User):
 
     new_user = {**user.model_dump(), "hashed_password": hashed_password}
     del new_user["password"]
-    del new_user["confirmed_password"]
+    del new_user["confirm_password"]
 
     new_user["enabled"] = True
     new_user["signed_up"] = datetime.now(timezone.utc)
     new_user["last_login"] = datetime.now(timezone.utc)
-    new_user["confirmed_email"] = True
+    new_user["confirmed_email"] = False
 
     print(new_user)
 
@@ -118,7 +118,7 @@ async def register(user: User):
 
     await send_verify_email(user.email, verification_token)
 
-    return {"access_token": access_token, "token_type": "bearer"}
+    return {"access_token": access_token, "refresh_token": "", "token_type": "bearer"}
 
 
 @app.post("/api/verify-email", response_model=UserInDB)
@@ -163,6 +163,12 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
 
     if not verify_password(form_data.password, user.hashed_password):
         raise HTTPException(status_code=400, detail="Incorrect username or password")
+    
+    if not user.confirmed_email:
+        raise HTTPException(status_code=400, detail="Please Confirm Email before Attempting login")
+
+    if not user.enabled:
+        raise HTTPException(status_code=400, detail="You're account is disabled, please contact support")
 
     users_collection.find_one_and_update(
         {"email": user.email}, {"$set": {"last_login": datetime.now(timezone.utc)}}

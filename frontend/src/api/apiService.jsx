@@ -2,19 +2,19 @@ import axios from "axios";
 import qs from "qs";
 
 const API_BASE_URL = "https://api.sweetaura.ai"; // Replace with your backend URL if different
-// http://localhost:8000
+// const API_BASE_URL = "http://localhost:8000";
 
 export const register = async (username, email, password, confirmPassword) => {
   try {
     // Log the data being sent to the API
-    console.log('Registering user with the following data:', { username, email });
+    console.log('Registering user with the following data:', { username, email, password, confirmPassword });
 
     // Make the POST request to the API
     const response = await axios.post(`${API_BASE_URL}/api/register`, {
-      username,
-      email,
-      password,
-      confirmPassword
+      "username": username,
+      "email": email,
+      "password": password,
+      "confirm_password": confirmPassword,
     });
 
     // Log the response data for debugging
@@ -42,6 +42,26 @@ export const register = async (username, email, password, confirmPassword) => {
 
     // Optionally, throw the error to be handled higher up (or show a user-friendly message)
     throw new Error('Registration failed. Please try again later.');
+  }
+};
+
+export const verifyEmail = async (token) => {
+  const url = `${API_BASE_URL}/api/verify-email`;
+
+  try {
+    // Create FormData and append the token
+    const formData = new FormData();
+    formData.append("token", token);
+
+    // Make the POST request to the API
+    const response = await axios.post(url, formData);
+
+    // Axios automatically parses JSON; directly return the response data
+    return response.data;
+  } catch (error) {
+    // Handle errors appropriately
+    console.error("Error verifying email:", error.response?.data?.detail || error.message);
+    throw new Error(error.response?.data?.detail || "Failed to verify email");
   }
 };
 

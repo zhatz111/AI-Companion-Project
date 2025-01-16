@@ -48,9 +48,10 @@ export const AuthProvider = ({ children }) => {
   };
   
 
-  const registerUser = async (username, email, password) => {
+  const registerUser = async (username, email, password, confirmPassword) => {
     try {
-      const data = await register(username, email, password);
+      console.log('Registering user with the following data Auth Context:', { username, email, password, confirmPassword });
+      const data = await register(username, email, password, confirmPassword);
       return data; // Return data if needed
     } catch (error) {
       console.error("Registration failed:", error);

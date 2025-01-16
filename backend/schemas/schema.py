@@ -12,8 +12,8 @@ from pydantic import BaseModel, EmailStr, Field
 class User(BaseModel):
     username: str
     email: EmailStr
-    password: str = Field(..., min_length=6)
-    confirm_password: str = Field(..., min_length=6)
+    password: str
+    confirm_password: str
 
 class UserInDB(BaseModel):
     username: str

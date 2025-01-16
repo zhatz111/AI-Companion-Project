@@ -27,8 +27,8 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/login")
 # Security Configuration
 SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = os.getenv("ALGORITHM")
-ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES"))
-REFRESH_TOKEN_EXPIRE_DAYS = int(os.getenv("REFRESH_TOKEN_EXPIRE_DAYS"))
+ACCESS_TOKEN_EXPIRE_MINUTES = float(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES"))
+REFRESH_TOKEN_EXPIRE_DAYS = float(os.getenv("REFRESH_TOKEN_EXPIRE_DAYS"))
 
 # UTILITY FUNCTIONS
 
@@ -46,20 +46,28 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
     )
 
 
-def create_access_token(data: dict, expires_delta: timedelta | None = None) -> str:
+def create_access_token(data: dict, expires_delta: int | None = None) -> str:
     to_encode = data.copy()
-    expire = datetime.now(timezone.utc) + (
-        expires_delta or timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    )
+    
+    # If expires_delta is None, use default expiration time (ACCESS_TOKEN_EXPIRE_MINUTES)
+    if expires_delta:
+        expire = datetime.now(timezone.utc) + timedelta(minutes=float(expires_delta))
+    else:
+        expire = datetime.now(timezone.utc) + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    
     to_encode.update({"exp": expire})
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
 
-def create_refresh_token(data: dict, expires_delta: timedelta | None = None) -> str:
+def create_refresh_token(data: dict, expires_delta: int | None = None) -> str:
     to_encode = data.copy()
-    expire = datetime.now(timezone.utc) + (
-        expires_delta or timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS)
-    )
+    
+    # If expires_delta is None, use default expiration time (REFRESH_TOKEN_EXPIRE_DAYS)
+    if expires_delta:
+        expire = datetime.now(timezone.utc) + timedelta(minutes=float(expires_delta))
+    else:
+        expire = datetime.now(timezone.utc) + timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS)
+    
     to_encode.update({"exp": expire})
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 

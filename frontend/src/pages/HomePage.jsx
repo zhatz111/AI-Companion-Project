@@ -7,9 +7,9 @@ const HomePage = ({ type }) => {
   return (
     <div className="flex flex-col sm:ml-4 sm:mr-4 mt-16 mb-8 h-full bg-[#212121] transition-all duration-500 ease-in-out min-h-screen">
         <Hero image={img_path}/>
-        <section className="bg-[#212121]">
+        <div className="bg-[#212121] pt-2">
             <CharacterCards gender={type}/>
-        </section>
+        </div>
     </div>
   )
 }

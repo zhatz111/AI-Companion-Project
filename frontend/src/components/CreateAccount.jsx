@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react'
+import React, { useState, useContext } from 'react'
 import { MdEmail } from "react-icons/md";
 import { IoMdClose } from "react-icons/io";
 import { RiLockPasswordLine } from "react-icons/ri";
@@ -35,6 +35,7 @@ const CreateAccount = ({ isVisible, onClose, onLogin }) => {
         e.preventDefault();
         try {
             if (match) {
+                console.log(formData.confirmPassword)
                 const response = await registerUser(formData.username, formData.email, formData.password, formData.confirmPassword);
                 setMessage("Account Succesfully Created!");
                 setFormData({ username: "", email: "", password: "", confirmPassword: "" })

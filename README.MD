@@ -116,7 +116,7 @@ EXPOSE 8000
 - Create an instance in AWS EC2. Preference is `Amazon Linux 2023` (free tier eligable) with `t2.micro` (free tier eligable).
 - Connect to the instance using either EC2 instance connect or SSH. Prefer to use SSH. SSH command for terminal: (Ensure you are in the directory where your key pair exists)
 ```bash
-ssh -i "sweetaura_key_pair.pem" ec2-user@ec2-3-137-169-130.us-east-2.compute.amazonaws.com
+ssh -i "sweetaura_key_pair.pem" ec2-user@ec2-18-117-93-45.us-east-2.compute.amazonaws.com
 ```
 - After connecting to your EC2 instance, it is necessary to update the system and install python 3.11 using the commands below:
 ```bash
@@ -133,12 +133,12 @@ python3.11 --version
 - After installing python we need to copy the backend files from the local computer to the instance in terminal. This may be modified in the future to just clone the git repo so things can be pulled easier. Use the command below on your local computer (NOT EC2 instance) to copy the files:
 ```bash
 # Copy all backend files to EC2 instance
-scp -i "sweetaura_key_pair.pem" -r ./backend ec2-user@ec2-3-137-169-130.us-east-2.compute.amazonaws.com:~/backend
+scp -i "sweetaura_key_pair.pem" -r ./backend ec2-user@ec2-18-117-93-45.us-east-2.compute.amazonaws.com:~/backend
 #  Check on EC2 instance that they were copied
 ls ~/backend
 
 # Copy the .env file to EC2 instance
-scp -i "sweetaura_key_pair.pem" -r .env ec2-user@ec2-3-137-169-130.us-east-2.compute.amazonaws.com:~/backend
+scp -i "sweetaura_key_pair.pem" -r .env ec2-user@ec2-18-117-93-45.us-east-2.compute.amazonaws.com:~/backend
 # Check to make sure the .env file was copied to the EC2 instance
 ls ~/backend/.env
 ```
@@ -176,27 +176,18 @@ sudo yum install nginx -y
 
 # Install Certbot for SSL Certificates (Let's Encrypt SSL)
 sudo yum install certbot python3-certbot-nginx -y
+```
+- Deactivate the venv to install the next package and obtain the certificate:
+```bash
+# Deactivate the venv
+deactivate
 
 # To obtain a wildcard SSL certificate use the DNS plugin for Spaceship
-pip install certbot-dns-spaceship
-
-# Obtain API and Secret key from Spaceship and create credentials file
-nano spaceship_credentials.ini
-
-# In the file enter this:
-[spaceship]
-api_key = your_api_key
-api_secret = your_api_secret
-
-# Secure the credentials file:
-chmod 600 spaceship_credentials.ini
+sudo yum install python3-certbot-dns-route53 -y
 
 # Use Certbot to obtain and configure the SSL certificate, this requires you to have a domain name already:
-sudo certbot certonly \
-    --authenticator dns-spaceship \
-    --dns-spaceship-credentials /home/ec2-user/backend/spaceship_credentials.ini \
-    -d "*.sweetaura.ai" -d "sweetaura.ai" \
-    --debug-challenges
+sudo AWS_ACCESS_KEY_ID=your_access_key  AWS_SECRET_ACCESS_KEY=your_secret_key  certbot certonly     --authenticator dns-route53     -d "*.sweetaura.ai" -d
+"sweetaura.ai"
 
 ```
 - After certbot runs correctly the result should have the following information:
@@ -204,9 +195,13 @@ sudo certbot certonly \
 # The result should have this information in it
 Certificate is saved at: /etc/letsencrypt/live/sweetaura.ai/fullchain.pem
 Key is saved at:         /etc/letsencrypt/live/sweetaura.ai/privkey.pem
-This certificate expires on 2025-04-15.
+This certificate expires on 2025-04-16.
 ```
 - Now we can edit the nginx config file and replace the `server` section with:
+```bash
+# To edit the conf file for nginx
+sudo nano /etc/nginx/nginx.conf
+```
 ```js
 # Redirect HTTP (port 80) to HTTPS (port 443)
 server {
@@ -240,5 +235,9 @@ server {
   - The uvicorn server can be started normally because the reverse proxy will redirect traffic from https to the http server at port 8000.
   - We can also edit the port configuration and take off port 8000 so users can not directly access that port, only the nginx port 80 can be accessed.
 ```bash
+# Activate the venv
+source venv/bin/activate
+
+# Start the uvicorn server
 uvicorn main:app --host 0.0.0.0 --port 8000
 ```
