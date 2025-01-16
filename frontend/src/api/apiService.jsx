@@ -4,8 +4,6 @@ import qs from "qs";
 const API_BASE_URL = "https://api.sweetaura.ai"; // Replace with your backend URL if different
 // http://localhost:8000
 
-import axios from 'axios';
-
 export const register = async (username, email, password) => {
   try {
     // Log the data being sent to the API

@@ -8,6 +8,8 @@ from fastapi_mail import FastMail, MessageSchema, ConnectionConfig
 # Load in all env variables
 load_dotenv()
 
+BASE_URL = "https://www.sweetaura.ai"
+
 # Configuration settings
 class EmailConfig(BaseSettings):
     MAIL_USERNAME: str
@@ -50,7 +52,7 @@ async def send_reset_email(username: str, email: EmailStr, token: str):
     Returns:
         None
     """
-    reset_link = f"http://localhost:3000/reset-password?token={token}"
+    reset_link = f"{BASE_URL}/reset-password?token={token}"
 
     subject = "Password Reset Request"
 
@@ -328,7 +330,7 @@ async def send_verify_email(email: EmailStr, token: str):
     Returns:
         None
     """
-    reset_link = f"http://localhost:3000/verify-email?token={token}"
+    reset_link = f"{BASE_URL}/verify-email?token={token}"
 
     subject = "Email Verification"
 
