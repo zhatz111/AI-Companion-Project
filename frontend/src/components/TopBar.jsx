@@ -36,7 +36,7 @@ const TopBar = ({ isOpen, setOpen, onLoginClick, onCreateClick }) => {
                     <div className='flex flex-row sm:gap-12 items-center justify-evenly'>
 
                         <div className='flex flex-row items-center justify-center'>
-                            <MdMenuOpen size={30} className={`text-[#FF6FCF] mx-0 hover:text-opacity-70 duration-300 mr-2 cursor-pointer ${!isOpen ? 'rotate-180' : ''}`} onClick={() => setOpen(!isOpen)} />
+                            {/* <MdMenuOpen size={30} className={`text-[#FF6FCF] mx-0 hover:text-opacity-70 duration-300 mr-2 cursor-pointer ${!isOpen ? 'rotate-180' : ''}`} onClick={() => setOpen(!isOpen)} /> */}
                             <Link className="flex flex-shrink-0  items-center mr-1 px-1" to="/">
                                 <div className="flex items-center justify-center group">
                                     <span className="text-white text-xl mm:text-2xl sm:text-3xl font-bold group-hover:text-opacity-70">Sweet</span>

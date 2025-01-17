@@ -5,10 +5,12 @@ import MessageList from '../components/MessageList';
 import ChatInput from '../components/ChatInput';
 import MessageProfile from '../components/MessageProfile';
 import ConversationList from '../components/ConversationList';
+import ChatTopBar from '../components/ChatTopBar';
 
 import { AuthContext } from "../api/AuthContext";
 import { ConversationContext } from '../api/ConversationContext';
 import { CharacterContext } from '../api/CharacterContext';
+import { EventContext } from '../api/EventContext';
 
 const ChatPage = () => {
     const [messages, setMessages] = useState([]);
@@ -19,6 +21,10 @@ const ChatPage = () => {
     const [isConvoCollapsed, setIsConvoCollapsed] = useState(false);
     const [isProfileCollapsed, setIsProfileCollapsed] = useState(false);
     const isFetchingConversation = useRef(false);
+
+    const { screenWidth } = useContext(EventContext);
+
+
 
     const {
         // getOrCreateConversation,
@@ -79,53 +85,48 @@ const ChatPage = () => {
     };
 
     return (
-        <div className="flex h-screen">
+        <>
         {currentCharacter ? (
-            <div className="flex flex-row justify-evenly h-full w-full">
-            {/* Message Profile - Sidebar Left */}
-            <div
-                className={`${
-                isConvoCollapsed ? 'hidden' : 'flex'
-                }  flex-col bg-[#1e1e1e] overflow-y-auto scrollbar border-r border-[#FF6FCF]`}
-            >
-                <ConversationList isCollapsed={isConvoCollapsed} item={itemId} />
-            </div>
+            <div className="flex flex-row w-full">
 
-            {/* Chat Message - Main Content */}
-            <div
-                className={`flex flex-col flex-[4] ${
-                isConvoCollapsed ? 'w-full' : ''
-                } max-h-screen bg-[#212121] transition-all duration-500`}
-            >
-                {/* Scrollable Message List */}
-                <div className="p-2 mt-16 mb-2 mx-6 flex-1 overflow-y-auto scrollbar">
-                <MessageList item={currentCharacter} messages={currentMessages} />
-                </div>
+                {/* Conversation list - Sidebar Left */}
 
-                {/* Sticky Chat Input */}
-                <div className="bg-[#212121] py-4">
-                <ChatInput
-                    item={currentCharacter}
-                    onSendMessage={handleSendMessage}
-                    onClickConvo={() => setIsConvoCollapsed(!isConvoCollapsed)}
-                    onClickProfile={() => setIsProfileCollapsed(!isProfileCollapsed)}
-                />
+                {/* <div className={`bg-[#1e1e1e] overflow-y-auto scrollbar border-r border-[#FF6FCF]`}>
+                    <ConversationList isCollapsed={false} item={itemId} />
+                </div> */}
+
+                {/* Chat Message - Main Content */}
+                <div className={`flex flex-col max-w-3xl mx-auto w-full overflow-y-auto scrollbar bg-[#212121]`}>
+                    {/* Scrollable Message List */}
+                    <div className="flex flex-col p-2 ">
+                        <MessageList item={currentCharacter} messages={currentMessages} />
+                    </div>
+
+                    {/* Sticky Chat Input */}
+                    <div className="bg-[#212121] py-4">
+                        <ChatInput
+                            item={currentCharacter}
+                            onSendMessage={handleSendMessage}
+                            onClickConvo={() => setIsConvoCollapsed(!isConvoCollapsed)}
+                            onClickProfile={() => setIsProfileCollapsed(!isProfileCollapsed)}
+                        />
+                    </div>
                 </div>
-            </div>
 
             {/* Message Profile - Sidebar Right */}
-            <div
+            {/* <div
                 className={`${
                 isProfileCollapsed ? 'hidden' : 'flex'
                 } flex-[2] flex-col max-w-xs lg:max-w-sm bg-[#1e1e1e] overflow-y-auto scrollbar transition-all duration-500`}
             >
                 <MessageProfile isCollapsed={isProfileCollapsed} item={currentCharacter} />
-            </div>
-            </div>
+            </div> */}
+
+        </div>
         ) : (
             <p>Page item is not present</p>
         )}
-        </div>
+        </>
 
     );
     

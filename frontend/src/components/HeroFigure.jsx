@@ -2,7 +2,7 @@ import React from 'react'
 
 const HeroFigure = ({ imageSrc, imageAlt }) => {
   return (
-    <div className='m-5 aspect-auto'>
+    <div className='mx-5 my-2 aspect-auto'>
         <figure className="">
             <img
                 className="w-full rounded-lg sm:rounded-2xl m-auto"

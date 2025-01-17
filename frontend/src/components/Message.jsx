@@ -17,11 +17,11 @@ const Message = ({ item, text, time, sender }) => {
 
   if (isSender) {
     return (
-      <div className="flex w-full items-end justify-end mt-4 ml-auto max-w-xl" ref={messagesEndRef}>
+      <div className="flex w-full items-end justify-end mx-auto" ref={messagesEndRef}>
       <div className="flex flex-col items-end justify-end">
         <span className="text-xs text-gray-500 pb-2 pr-2">{user?.username}</span>
         <div className="bg-[#303030] text-white p-4 rounded-l-2xl rounded-tr-2xl">
-          <p className="text-mm md:text-sm lg:text-base">{text}</p>
+          <p className="text-sm lg:text-base">{text}</p>
         </div>
         <span className="text-xs text-gray-500 pt-2 pr-2 leading-none">{time}</span>
       </div>
@@ -43,7 +43,7 @@ const Message = ({ item, text, time, sender }) => {
         <div>
         <span className="text-xs text-gray-500 pb-2 pl-2 block">{item.name}</span>
           <div className="bg-[#fd3abc] bg-opacity-70 text-white p-4 rounded-r-2xl rounded-tl-2xl">
-            <p className="text-mm md:text-sm lg:text-base">{text}</p>
+            <p className="text-sm lg:text-base">{text}</p>
           </div>
           <span className="text-xs text-gray-500 pt-2 pl-2 leading-none block">{time}</span>
         </div>

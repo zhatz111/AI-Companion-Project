@@ -42,18 +42,19 @@ const ChatInput = ({ item, onSendMessage, onClickConvo, onClickProfile }) => {
           handleSubmit(event); // Call the submit function if logged in
           }
       };
-  
-  
+
+
     return (
-      <div className="flex items-center max-w-6xl mx-auto px-4 w-full">
+      <div className="flex max-w-3xl mx-auto px-4">
+
         {/* Collapse Button */}
-        <div className="flex items-center justify-center px-2">
+        {/* <div className="flex items-center justify-center px-2">
           <BiCollapseHorizontal
             className="text-white cursor-pointer"
             size={20}
             onClick={onClickConvo} // Toggle visibility
           />
-        </div>
+        </div> */}
 
         {/* Form */}
         <form className="flex-grow" onSubmit={handleSubmit}>
@@ -61,12 +62,12 @@ const ChatInput = ({ item, onSendMessage, onClickConvo, onClickProfile }) => {
             Your message
           </label>
           <div className="flex justify-center relative w-full">
-            <div className="relative w-full  ">
+            <div className="relative w-full">
               <textarea
                 id="chat"
                 rows="1"
                 wrap="soft"
-                className="block resize-none rounded-lg outline-none p-4 w-full text-sm text-nowrap sm:text-md bg-[#303030] text-white pr-16 h-14"
+                className="block resize-none rounded-2xl outline-none p-4 w-full text-sm text-nowrap sm:text-md bg-[#303030] text-white pr-16 h-14"
                 placeholder={`Message ${firstName}`}
                 value={text}
                 onChange={(e) => setText(e.target.value)}
@@ -79,7 +80,7 @@ const ChatInput = ({ item, onSendMessage, onClickConvo, onClickProfile }) => {
               <button
                 type="submit"
                 disabled={!user} // Disable button if user is not logged in or message is empty
-                className="absolute top-1/2 right-3 transform -translate-y-1/2 p-3 text-[#FF6FCF] rounded-full cursor-pointer hover:bg-gray-300 bg-gray-100"
+                className="absolute top-1/2 right-3 transform -translate-y-1/2 p-2 text-[#FF6FCF] rounded-full cursor-pointer hover:bg-gray-300 bg-gray-100"
               >
                 <FaArrowUpLong />
               </button>
@@ -87,13 +88,13 @@ const ChatInput = ({ item, onSendMessage, onClickConvo, onClickProfile }) => {
           </div>
         </form>
 
-        <div className="flex items-center justify-center px-2">
+        {/* <div className="flex items-center justify-center px-2">
           <BiCollapseHorizontal
             className="text-white cursor-pointer"
             size={20}
             onClick={onClickProfile} // Toggle visibility
           />
-        </div>
+        </div> */}
       </div>
 
   )

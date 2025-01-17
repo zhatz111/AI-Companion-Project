@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import Sidebar from '../components/Sidebar';
 import TopBar from '../components/TopBar';
 import AuthScreen from '../components/AuthScreen'; // Use AuthScreen instead of Login and CreateAccount
 import Settings from '../components/Settings';
 import Verification from '../components/Verification';
 import { verifyEmail } from "../api/apiService"
+import { EventContext } from '../api/EventContext';
+import ChatTopBar from '../components/ChatTopBar';
 
 const MainLayout = ({ children }) => {
     const [isOpen, setOpen] = useState(false);
@@ -14,7 +16,8 @@ const MainLayout = ({ children }) => {
     const [isVerifiedVisible, setIsVerifiedVisible] = useState(false);
     const [status, setStatus] = useState("Verifying...");
     const [error, setError] = useState(null);
-    
+    const { screenWidth } = useContext(EventContext);
+
     useEffect(() => {
         // Check if "verify-email" is in the URL
         const url = window.location.href;
@@ -56,18 +59,18 @@ const MainLayout = ({ children }) => {
     };
 
     return (
-        <div className="flex overflow-y-auto scrollbar bg-[#212121]">
+        <div className="flex h-screen bg-[#212121]">
             <TopBar
                 isOpen={isOpen}
                 setOpen={setOpen}
                 onLoginClick={() => {
                     setAuthVisible(true);  // Show AuthScreen
                     setIsLoginVisible(true);  // Make sure Login is visible initially
-                }} 
+                }}
                 onCreateClick={() => {
                     setAuthVisible(true);  // Show AuthScreen
                     setIsLoginVisible(false);  // Make sure CreateAccount is visible
-                }} 
+                }}
             />
 
             {isAuthVisible && (
@@ -83,17 +86,19 @@ const MainLayout = ({ children }) => {
 
             <Settings onClose={() => setIsSettingsVisible(false)} setIsSettingsVisible={setIsSettingsVisible} isSettingsVisible={isSettingsVisible}/>
 
-            <div className="flex-1 overflow-y-auto ">
-                <Sidebar isOpen={isOpen}  onLoginClick={() => {
-                    setAuthVisible(true);  // Show AuthScreen
-                    setIsLoginVisible(true);  // Make sure Login is visible initially
-                }} toggleSidebar={() => setOpen(!isOpen)} onSettingsClick={() => setIsSettingsVisible(true)}/>
-                <div className={`${isOpen ? 'sm:pl-60 pl-24' : 'pl-24'} transition-all duration-500 ease-in-out`}>
-                    {children}
+            {/* <Sidebar isOpen={isOpen}  onLoginClick={() => {
+                setAuthVisible(true);  // Show AuthScreen
+                setIsLoginVisible(true);  // Make sure Login is visible initially
+            }} toggleSidebar={() => setOpen(!isOpen)} onSettingsClick={() => setIsSettingsVisible(true)}/> */}
+                {/* Top Bar Selector */}
+            <div className='flex flex-col justify-between w-full'>
+                <div className='flex mt-16'>
+                    <ChatTopBar />
                 </div>
+                {children}
             </div>
         </div>
     );
 };
-
+// ${isOpen ? 'sm:pl-60 pl-24' : 'pl-24'}
 export default MainLayout;

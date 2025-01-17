@@ -5,9 +5,11 @@ import App from './App.jsx'
 import { ConversationProvider } from './api/ConversationContext';
 import { AuthProvider } from "./api/AuthContext";
 import { CharacterProvider } from './api/CharacterContext.jsx';
+import { EventProvider } from "./api/EventContext";
 
 createRoot(document.getElementById('root')).render(
   // <StrictMode>
+  <EventProvider>
     <AuthProvider>
       <CharacterProvider>
         <ConversationProvider>
@@ -15,5 +17,6 @@ createRoot(document.getElementById('root')).render(
         </ConversationProvider>
       </CharacterProvider>
     </AuthProvider>
+  </EventProvider>
   // </StrictMode>,
 )

@@ -1,8 +1,8 @@
 import axios from "axios";
 import qs from "qs";
 
-const API_BASE_URL = "https://api.sweetaura.ai"; // Replace with your backend URL if different
-// const API_BASE_URL = "http://localhost:8000";
+// const API_BASE_URL = "https://api.sweetaura.ai"; // Replace with your backend URL if different
+const API_BASE_URL = "http://localhost:8000";
 
 export const register = async (username, email, password, confirmPassword) => {
   try {
