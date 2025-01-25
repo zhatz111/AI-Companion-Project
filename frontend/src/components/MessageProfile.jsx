@@ -10,9 +10,9 @@ import { MdSportsMartialArts } from "react-icons/md";
 import { PiHeadCircuitFill } from "react-icons/pi";
 import { BsArrowsCollapseVertical } from "react-icons/bs";
 
-const MessageProfile = ({ item, isCollapsed }) => {
+const MessageProfile = ({ item }) => {
     return (
-        <div className="flex mt-16 border-l border-[#FF6FCF] pt-6">
+        <div className="flex pt-6">
             <div>
                 <div className="flex aspect-[10/15] mx-5 mb-3">
                     <img className="object-cover rounded-xl overflow-hidden" src={item.alt_img_path} alt={item.name}></img>

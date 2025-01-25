@@ -4,7 +4,7 @@ import HeroFigure from './HeroFigure'
 
 const Hero = ({ image }) => {
   return (
-      <div className="text-center">
+      <div className="flex mx-auto">
           <HeroFigure
           imageSrc={image}
           imageAlt="Explore Aura"

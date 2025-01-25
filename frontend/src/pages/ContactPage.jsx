@@ -28,7 +28,7 @@ const ResetPasswordPage = () => {
 
   return (
     <section className="bg-[#212121]">
-      <div className="pt-20 pb-6 px-4 h-screen mx-auto max-w-screen-md">
+      <div className=" pb-6 px-4 h-screen mx-auto max-w-screen-md">
         <h2 className="mb-8 mt-8 text-4xl font-extrabold text-center text-[#FF6FCF]">
           Contact Us
         </h2>

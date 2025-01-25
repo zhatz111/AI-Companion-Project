@@ -45,7 +45,7 @@ const ChatInput = ({ item, onSendMessage, onClickConvo, onClickProfile }) => {
 
 
     return (
-      <div className="flex max-w-3xl mx-auto px-4">
+      <div className="flex max-w-3xl w-full mx-auto px-4">
 
         {/* Collapse Button */}
         {/* <div className="flex items-center justify-center px-2">
@@ -57,7 +57,7 @@ const ChatInput = ({ item, onSendMessage, onClickConvo, onClickProfile }) => {
         </div> */}
 
         {/* Form */}
-        <form className="flex-grow" onSubmit={handleSubmit}>
+        <form className="flex w-full" onSubmit={handleSubmit}>
           <label htmlFor="chat" className="sr-only">
             Your message
           </label>

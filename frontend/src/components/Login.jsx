@@ -56,7 +56,7 @@ const Login = ({ isVisible, onClose, onSignUp }) => {
                 onClick={onClose} // Close the overlay when clicking outside
             >
                 <div
-                    className="bg-[#212121] rounded-2xl shadow-lg w-full max-w-md"
+                    className="bg-[#212121] rounded-2xl shadow-lg w-full mx-auto sm:max-w-md max-w-xs"
                     onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside
                 >
                     <div className="border-b flex-row flex items-center justify-between border-[#FF6FCF] p-6">

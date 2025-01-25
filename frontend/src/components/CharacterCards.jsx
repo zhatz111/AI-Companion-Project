@@ -21,10 +21,10 @@ const CharacterCards = ({ gender }) => {
 
 
   return (
-    <div className="w-full container-lg lg:container mx-auto  text-start">
+    <div className="w-full mx-auto">
         {/* <span className="text-md mm:text-lg sm:text-xl lg:text-4xl xl:text-5xl font-bold text-[#FF6FCF] mb-6">Explore Unique </span>
         <span className="text-md mm:text-lg sm:text-xl lg:text-4xl xl:text-5xl font-bold text-white mb-6">AI Characters</span> */}
-        <div className="object-scale-down px-6 mx-auto grid 3xl:grid-cols-6 xl:grid-cols-5 md:grid-cols-4 grid-cols-2 gap-8">
+        <div className="object-scale-down px-6 mx-auto grid lg:grid-cols-4 md:grid-cols-3 grid-cols-2 gap-8">
         {characters
           .filter(character => character.gender === gender) // Filter by gender
           .map((character, index) => (

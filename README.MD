@@ -241,3 +241,30 @@ source venv/bin/activate
 # Start the uvicorn server
 uvicorn main:app --host 0.0.0.0 --port 8000
 ```
+- Use this command to check the processes currently running on Linux. Helpful for determining if the server is already up and running.
+```bash
+ps aux
+```
+
+### Using Gunicorn to Run Mulitple Uvicorn Workers for Backend
+- It seems like good practice to use gunicorn with uvicorn to be able to run mulitple uvicorn workers in the case that there is an issue with the uvicorn server. To do this follow the steps below:
+- Install gunicorn using pip
+```bash
+pip install gunicorn
+```
+- Create gunicorn config file for more configuration flexibility
+```bash
+nano gunicorn.conf.py
+
+# Paste in these commands which can be modified based on the system
+bind = "0.0.0.0:8000"
+workers = 4  # Number of worker processes
+worker_class = "uvicorn.workers.UvicornWorker"
+loglevel = "info"
+accesslog = "/var/log/gunicorn_access.log"  # Path to access log, if error from this you can remove it
+errorlog = "/var/log/gunicorn_error.log"    # Path to error log, if error from this you can remove it
+timeout = 120  # Timeout in seconds
+
+# Start the server
+gunicorn main:app -c gunicorn.conf.py
+```

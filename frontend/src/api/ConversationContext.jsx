@@ -12,6 +12,7 @@ export const ConversationProvider = ({ children }) => {
     const [currentConversation, setCurrentConversation] = useState(null);
     const [conversationList, setConversationList] = useState([]);
     const [currentMessages, setCurrentMessages] = useState([]);
+    const [activeView, setActiveView] = useState(null); // null means all divs are shown
 
     const getConversations = async (aiCharacter) => {
         if (!token || !user) {
@@ -177,7 +178,9 @@ export const ConversationProvider = ({ children }) => {
         <ConversationContext.Provider value={{ 
             currentConversation, 
             conversationList, 
-            currentMessages, 
+            currentMessages,
+            activeView,
+            setActiveView,
             setCurrentConversation, 
             setCurrentMessages, 
             setConversationList,

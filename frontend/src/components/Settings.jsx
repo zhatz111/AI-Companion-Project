@@ -42,10 +42,8 @@ const Settings = ( { onClose, isSettingsVisible } ) => {
   const [deleteAccount, setDeleteAccount] = useState(false);
 
   const [file, setFile] = useState(null);
-  const [imageSrc, setImageSrc] = useState(null);
 
   const MAX_SIZE_MB = 2; // Maximum file size in MB
-  const MAX_DIMENSION = 400; // Max width/height
 
   const handleFileChange = async (event) => {
     const file = event.target.files[0];
@@ -241,7 +239,6 @@ const Settings = ( { onClose, isSettingsVisible } ) => {
     setDeleteAccount(false)
 
     setFile(null)
-    setImageSrc(null)
 
     resetSelectedValues()
     }, [activeTab, onClose]);
@@ -291,9 +288,9 @@ const Settings = ( { onClose, isSettingsVisible } ) => {
                         Upload Profile Pic
                         </label>
                         <div className='flex flex-row items-center pt-1 gap-3'>
-                            {user.image_url ? (
+                            {user?.image_url ? (
                             <img
-                                src={user.image_url}
+                                src={user?.image_url}
                                 className="object-cover rounded-full h-12 w-12 flex-shrink-0"
                                 alt="Profile"
                             />
@@ -337,7 +334,7 @@ const Settings = ( { onClose, isSettingsVisible } ) => {
                                     type="text" 
                                     id="username_input" 
                                     className="text-sm rounded-lg w-full max-w-sm outline-none block p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white" 
-                                    placeholder={user.username}
+                                    placeholder={user?.username}
                                     value={username} // Bind the input value to state
                                     onChange={(e) => setUsername(e.target.value)} // Update state on input change
                                     required
@@ -359,7 +356,7 @@ const Settings = ( { onClose, isSettingsVisible } ) => {
                         <>
                             <div>
                                 <div>Username</div>
-                                <div className='text-gray-500'>{user.username}</div>
+                                <div className='text-gray-500'>{user?.username}</div>
                             </div>
                             <button 
                                 className="btn relative btn-secondary shrink-0"
@@ -389,7 +386,7 @@ const Settings = ( { onClose, isSettingsVisible } ) => {
                                         type="text" 
                                         id="username_input" 
                                         className="text-sm rounded-lg w-full max-w-sm outline-none block p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white" 
-                                        placeholder={user.email} 
+                                        placeholder={user?.email} 
                                         value={email} // Bind the input value to state
                                         onChange={(e) => setEmail(e.target.value)} // Update state on input change
                                         required 
@@ -411,7 +408,7 @@ const Settings = ( { onClose, isSettingsVisible } ) => {
                         <>
                             <div>
                                 <div>Email (Requires Logout)</div>
-                                <div className='text-gray-500'>{user.email}</div>
+                                <div className='text-gray-500'>{user?.email}</div>
                             </div>
                             <button 
                                 className="btn relative btn-secondary shrink-0" 
@@ -448,13 +445,13 @@ const Settings = ( { onClose, isSettingsVisible } ) => {
     case 'Personalization':
         return (
                         <div className='flex flex-col w-full gap-3 px-4 pb-2 text-sm text-token-text-primary justify-between'>
-                            <div className='flex gap-28 flex-row text-nowrap items-center justify-between border-b border-gray-500 pb-4 pt-2'>
-                                <div className='flex flex-row'>
+                            <div className='flex md:flex-row flex-col text-nowrap items-center justify-between border-b border-gray-500 pb-4 pt-2'>
+                                <div className='flex flex-col items-center md:items-start justify-between'>
                                     <label htmlFor="age" className="block text-sm font-medium text-white">Age</label>
                                     {/* Add a fixed width and text alignment */}
-                                    <div className='px-4 w-12  text-gray-500'>(18 years or older)</div>
+                                    <div className='block text-gray-500 py-1'>(18 years or older)</div>
                                 </div>
-                                <div className='flex flex-row'>
+                                <div className='flex w-md'>
                                     <input 
                                         type="number"
                                         min="18"
@@ -462,17 +459,18 @@ const Settings = ( { onClose, isSettingsVisible } ) => {
                                         value={age}
                                         onChange={handleInputChange}
                                         className="text-sm rounded-lg w-full max-w-sm outline-none block p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white" 
-                                        placeholder={user.age != null ? `${user.age} years old` : "Years"}
+                                        placeholder={user?.age != null ? `${user?.age} years old` : "Years"}
                                         required 
                                     />
                                 </div>
                             </div>
 
-                            <div className='flex gap-36 flex-row text-nowrap items-center justify-center border-b border-gray-500 pb-4 pt-2'>
-                                <div className='flex flex-row'>
+                            <div className='flex md:flex-row flex-col text-nowrap md:gap-32 items-center justify-between border-b border-gray-500 pb-4 pt-2'>
+                                <div className='flex'>
                                     <label htmlFor="height" className="block mb-2 text-sm font-medium text-white">Height</label>
                                 </div>
-                                <div className='flex gap-2 flex-row'>
+                                <div className='flex gap-2 w-full'>
+                                    <div className='flex w-full'>
                                     <input 
                                         type="number"
                                         min="1"
@@ -481,9 +479,12 @@ const Settings = ( { onClose, isSettingsVisible } ) => {
                                         value={heightFeet}
                                         onChange={(e) => setHeightFeet(e.target.value)}
                                         className="text-sm rounded-lg w-full max-w-sm outline-none block p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white" 
-                                        placeholder={user.height_feet != null ? `${user.height_feet} foot` : "Feet"}
+                                        placeholder={user?.height_feet != null ? `${user?.height_feet} foot` : "Feet"}
                                         required 
                                     />
+                                    </div>
+
+                                    <div className='flex w-full'>
                                     <input 
                                         type="number"
                                         min="0"
@@ -492,17 +493,18 @@ const Settings = ( { onClose, isSettingsVisible } ) => {
                                         value={heightInches}
                                         onChange={(e) => setHeightInches(e.target.value)}
                                         className="text-sm rounded-lg w-full max-w-sm outline-none block p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
-                                        placeholder={user.height_inches != null ? `${user.height_inches}` : "Inches"}
+                                        placeholder={user?.height_inches != null ? `${user?.height_inches}` : "Inches"}
                                         required 
                                     />
+                                    </div>
                                 </div>
                             </div>
 
-                            <div className='flex gap-36 flex-row text-nowrap items-center justify-center border-b border-gray-500 pb-4 pt-2'>
+                            <div className='flex md:flex-row flex-col text-nowrap items-center justify-between border-b border-gray-500 pb-4 pt-2'>
                                 <div className='flex flex-row'>
                                     <label htmlFor="weight" className="block mb-2 text-sm font-medium text-white">Weight</label>
                                 </div>
-                                <div className='flex gap-4 flex-row'>
+                                <div className='flex flex-row'>
                                     <input 
                                         type="number"
                                         min="1"
@@ -510,7 +512,7 @@ const Settings = ( { onClose, isSettingsVisible } ) => {
                                         value={weight}
                                         onChange={(e) => setWeight(e.target.value)}
                                         className="text-sm rounded-lg w-full max-w-sm outline-none block p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white" 
-                                        placeholder={user.weight != null ? `${user.weight} lbs` : "lbs"}
+                                        placeholder={user?.weight != null ? `${user?.weight} lbs` : "lbs"}
                                         required 
                                     />
                                 </div>
@@ -526,7 +528,7 @@ const Settings = ( { onClose, isSettingsVisible } ) => {
                                 className="text-white outline-none font-base text-sm px-5 py-2.5 text-center inline-flex items-center"
                                 type="button"
                                 >
-                                <p className='text-gray-500'>{user.gender != null ? `${user.gender}` : `${selectedValues.gender}`}</p>
+                                <p className='text-gray-500'>{user?.gender != null ? `${user?.gender}` : `${selectedValues.gender}`}</p>
                                 <svg
                                     className="w-3 h-3 ms-3 hover:text-gray-500/60"
                                     aria-hidden="true"
@@ -573,7 +575,7 @@ const Settings = ( { onClose, isSettingsVisible } ) => {
                                 className="text-white outline-none font-base rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center"
                                 type="button"
                                 >
-                                <p className='text-gray-500'>{user.identity != null ? `${user.identity}` : `${selectedValues.identity}`}</p>
+                                <p className='text-gray-500'>{user?.identity != null ? `${user?.identity}` : `${selectedValues.identity}`}</p>
                                 <svg
                                     className="w-3 h-3 ms-3 hover:text-gray-500/60"
                                     aria-hidden="true"
@@ -620,7 +622,7 @@ const Settings = ( { onClose, isSettingsVisible } ) => {
                                 className="text-white outline-none font-base rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center"
                                 type="button"
                                 >
-                                <p className='text-gray-500'>{user.sexuality != null ? `${user.sexuality}` : `${selectedValues.sexuality}`}</p>
+                                <p className='text-gray-500'>{user?.sexuality != null ? `${user?.sexuality}` : `${selectedValues.sexuality}`}</p>
                                 <svg
                                     className="w-3 h-3 ms-3 hover:text-gray-500/60"
                                     aria-hidden="true"
@@ -667,7 +669,7 @@ const Settings = ( { onClose, isSettingsVisible } ) => {
                         className="text-white outline-none font-base rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center"
                         type="button"
                         >
-                        <p className='text-gray-500'>{user.politics != null ? `${user.politics}` : `${selectedValues.politics}`}</p>
+                        <p className='text-gray-500'>{user?.politics != null ? `${user?.politics}` : `${selectedValues.politics}`}</p>
                         <svg
                             className="w-3 h-3 ms-3 hover:text-gray-500/60"
                             aria-hidden="true"
@@ -854,10 +856,10 @@ const Settings = ( { onClose, isSettingsVisible } ) => {
             onClick={onClose} // Add a close handler here
             />
         </div>
-        <div className="flex flex-row gap-8 p-4">
+        <div className="flex flex-row md:gap-8 p-4">
             <div className="flex flex-col">
             <button
-                className={`p-2 my-1 flex items-center text-sm text-white text-nowrap rounded-lg ${
+                className={`p-2 my-1 flex items-center text-xs md:text-sm text-white text-nowrap rounded-lg ${
                 activeTab === 'General' ? 'bg-gray-500/50' : ''
                 }`}
                 onClick={() => setActiveTab('General')}
@@ -869,7 +871,7 @@ const Settings = ( { onClose, isSettingsVisible } ) => {
             </button>
     
             <button
-                className={`p-2 my-1 flex items-center text-sm text-nowrap text-white rounded-lg ${
+                className={`p-2 my-1 flex items-center text-xs md:text-sm text-nowrap text-white rounded-lg ${
                 activeTab === 'Personalization' ? 'bg-gray-500/50' : ''
                 }`}
                 onClick={() => setActiveTab('Personalization')}
@@ -881,7 +883,7 @@ const Settings = ( { onClose, isSettingsVisible } ) => {
             </button>
     
             <button
-                className={`p-2 my-1 flex items-center text-sm text-nowrap text-white rounded-lg ${
+                className={`p-2 my-1 flex items-center text-xs md:text-sm text-nowrap text-white rounded-lg ${
                 activeTab === 'Data Controls' ? 'bg-gray-500/50' : ''
                 }`}
                 onClick={() => setActiveTab('Data Controls')}
@@ -893,7 +895,7 @@ const Settings = ( { onClose, isSettingsVisible } ) => {
             </button>
     
             <button
-                className={`p-2 my-1 flex items-center text-sm text-nowrap text-white rounded-lg ${
+                className={`p-2 my-1 flex items-center text-xs md:text-sm text-nowrap text-white rounded-lg ${
                 activeTab === 'Security' ? 'bg-gray-500/50' : ''
                 }`}
                 onClick={() => setActiveTab('Security')}

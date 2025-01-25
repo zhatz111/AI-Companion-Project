@@ -77,33 +77,14 @@ const ConversationList = ({ item }) => {
     };
 
     return (
-        <div className="flex-[2] mt-16 p-4">
+        <div className="flex flex-col p-4 items-center justify-between">
             {/* Search Form */}
-            <div className="flex gap-2 items-center justify-center">
+            <div className="flex gap-2 items-center justify-between">
                 <div className="flex">
                     <form
                         className="form relative"
                         onSubmit={(e) => e.preventDefault()} // Prevent form submission
                     >
-                        {/* <button className="absolute left-2 -translate-y-1/2 top-1/2 p-1">
-                            <svg
-                                width="17"
-                                height="16"
-                                fill="none"
-                                xmlns="http://www.w3.org/2000/svg"
-                                role="img"
-                                aria-labelledby="search"
-                                className="w-5 h-5 text-gray-500"
-                            >
-                                <path
-                                    d="M7.667 12.667A5.333 5.333 0 107.667 2a5.333 5.333 0 000 10.667zM14.334 14l-2.9-2.9"
-                                    stroke="currentColor"
-                                    strokeWidth="1"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                ></path>
-                            </svg>
-                        </button> */}
                         <input
                             className=" rounded-full px-8 py-3 text-white text-sm border-2 border-transparent bg-black focus:outline-none focus:border-[#FF6FCF] placeholder-gray-400 transition-all duration-300 shadow-lg"
                             placeholder="Search..."
@@ -146,7 +127,7 @@ const ConversationList = ({ item }) => {
                             width="40px"
                             height="40px"
                             viewBox="0 0 24 24"
-                            className="w-6 h-6 md:w-10 md:h-10 lg:w-12 lg:h-12 stroke-pink-400 fill-none group-hover:fill-pink-800 group-active:stroke-pink-200 group-active:fill-pink-600 group-active:duration-0 duration-300"
+                            className="w-10 h-10 stroke-pink-400 fill-none group-hover:fill-pink-800 group-active:stroke-pink-200 group-active:fill-pink-600 group-active:duration-0 duration-300"
                         >
                             <path
                                 d="M12 22C17.5 22 22 17.5 22 12C22 6.5 17.5 2 12 2C6.5 2 2 6.5 2 12C2 17.5 6.5 22 12 22Z"
