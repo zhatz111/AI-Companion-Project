@@ -8,15 +8,22 @@ import { GiBodyHeight } from "react-icons/gi";
 import { IoMdPeople } from "react-icons/io";
 import { MdSportsMartialArts } from "react-icons/md";
 import { PiHeadCircuitFill } from "react-icons/pi";
-import { BsArrowsCollapseVertical } from "react-icons/bs";
+import { Carousel } from "flowbite-react";
 
 const MessageProfile = ({ item }) => {
     return (
-        <div className="flex pt-6">
+        <div className="flex">
             <div>
-                <div className="flex aspect-[10/15] mx-5 mb-3">
-                    <img className="object-cover rounded-xl overflow-hidden" src={item.alt_img_path} alt={item.name}></img>
+                
+                <div className="h-128 p-6 rounded-3xl">
+                <Carousel slide={false}>
+                    <img className="rounded-3xl" src={item.alt_img_path} alt={item.name} />
+                    <img className="rounded-3xl" src={item.img_path} alt={item.name} />
+                </Carousel>
                 </div>
+
+
+
                 <div className='pl-4 pt-2 pr-2'>
                     <h1 className="text-sm sm:text-xl 2xl:text-3xl font-bold text-white text-left">{item.name}</h1>
                     <h2 className="text-xs sm:text-md xl:text-lg text-gray-300 text-left py-4">{item.description}</h2>

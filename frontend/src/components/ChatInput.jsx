@@ -67,7 +67,7 @@ const ChatInput = ({ item, onSendMessage, onClickConvo, onClickProfile }) => {
                 id="chat"
                 rows="1"
                 wrap="soft"
-                className="block resize-none rounded-2xl outline-none p-4 w-full text-sm text-nowrap sm:text-md bg-[#303030] text-white pr-16 h-14"
+                className="block resize-none rounded-2xl outline-none p-4 w-full text-sm overflow-hidden sm:text-md bg-[#303030] text-white pr-16 h-14"
                 placeholder={`Message ${firstName}`}
                 value={text}
                 onChange={(e) => setText(e.target.value)}

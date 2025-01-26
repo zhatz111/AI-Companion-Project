@@ -42,22 +42,28 @@ const Conversation = ({ currConversation, isActive, onDelete }) => {
 
     // const finalOutput = `${humanReadableDate}`; // (${timezoneName}, ${formattedOffset})
     
-    const { setCurrentConversation, setCurrentMessages } = useContext(ConversationContext);
+    const { setCurrentConversation, setCurrentMessages, setActiveView } = useContext(ConversationContext);
 
   return (
     <div
       className={`flex flex-row rounded-xl cursor-pointer p-3 text-nowrap w-full max-w-sm ${
         isActive ? "bg-gray-800/60 border" : "bg-gray-800/60" // Highlight active, default others
       } hover:bg-gray-500`}
-      onClick={handleClick}
+      onClick={() => {
+        handleClick();
+      }}
     >
-      <div className="w-full flex flex-col justify-center">
+      <div className="w-full flex flex-col justify-center"
+      onClick={() => {
+        setActiveView("chat");
+      }}
+      >
         <h1 className="text-white text-sm pb-2">{finalOutput}</h1>
         <p className="text-gray-400 text-sm">
           {currConversation.messages[currConversation.messages.length - 1]?.content?.slice(0, 35) || "New Chat"}
         </p>
       </div>
-      <div className='flex p-2'>
+      <div className='flex p-2 z-30'>
         <button
           onClick={onDelete} // Trigger the delete when clicked
           className="inline-flex items-center px-2 py-2 bg-red-600/60 transition ease-in-out delay-75 hover:bg-red-700 text-white text-sm font-medium rounded-md hover:-translate-y-1 hover:scale-110"

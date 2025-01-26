@@ -268,3 +268,38 @@ timeout = 120  # Timeout in seconds
 # Start the server
 gunicorn main:app -c gunicorn.conf.py
 ```
+- Use systemd to make sure the server is restarted if it ever goes down
+```ini
+[Unit]
+Description=FastAPI with Gunicorn
+After=network.target
+
+[Service]
+User=ec2-user
+WorkingDirectory=/home/ec2-user/backend
+ExecStart=/home/ec2-user/backend/venv/bin/gunicorn main:app -c gunicorn.conf.py
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+```
+- Useful commands to save the config, enable the service, and check for any errors
+```bash
+# Save updated service file
+sudo nano /etc/systemd/system/fastapi.service
+
+# Reload the systemd config
+sudo systemctl daemon-reload
+
+# restart the service to apply changes
+sudo systemctl restart fastapi
+
+# Enable the service to start on boot
+sudo systemctl enable fastapi
+
+# Check the status of the service
+sudo systemctl status fastapi
+
+# Debug issues with logs for errors
+journalctl -u fastapi
+```

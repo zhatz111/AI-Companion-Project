@@ -13,19 +13,19 @@ const App = () => {
         <Routes>
           <Route
             path="/"
-            element={ <HomePage type="female"/> }
+            element={ <HomePage type="female" subType="human"/> }
           />
           <Route
             path="/verify-email"
-            element={ <HomePage type="female"/> }
+            element={ <HomePage type="female" subType="human"/> }
           />
           <Route
             path="/ai-dogs"
-            element={ <HomePage type="male"/> }
+            element={ <HomePage type="male" subType="human"/> }
           />
           <Route
             path="/ai-anime"
-            element={ <HomePage type="anime"/> }
+            element={ <HomePage type="female/male" subType="anime"/> }
           />
           <Route
             path="/reset-password"

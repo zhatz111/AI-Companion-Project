@@ -97,7 +97,7 @@ const ChatPage = () => {
 
     const handleResponsiveView = (screenWidth, setActiveView) => {
         if (screenWidth < 1024) {
-          setActiveView("chat");
+          setActiveView("convos");
         } else {
           setActiveView(null);
         }
@@ -136,7 +136,7 @@ const ChatPage = () => {
                 <div className="flex flex-col w-full justify-end bg-[#212121]">
                 
                     {/* Scrollable Message List */}
-                    <div className="flex flex-col p-2 overflow-y-auto scrollbar w-full">
+                    <div className="flex flex-col p-6 mx-auto overflow-y-auto scrollbar w-full">
                         <MessageList item={currentCharacter} messages={currentMessages} />
                     </div>
 

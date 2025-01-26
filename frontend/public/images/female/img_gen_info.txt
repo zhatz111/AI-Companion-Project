@@ -1,0 +1,8 @@
+website: Seaart.ai
+model: Pony Pro Realistic - Dream Diffusion, Pro-V2
+image settings: 2x3
+quantity: 3
+sampling method: DPM++2M Karras
+sampling steps: 20
+CFG Scale: 7.0
+fixed seed: 504927238

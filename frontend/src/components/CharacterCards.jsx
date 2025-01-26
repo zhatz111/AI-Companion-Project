@@ -4,7 +4,7 @@ import aiCharacters from '../data/characters';
 import { CharacterContext } from '../api/CharacterContext';
 import { useNavigate } from 'react-router-dom';
 
-const CharacterCards = ({ gender }) => {
+const CharacterCards = ({ gender, type }) => {
   const { characters, setCharacters, setCurrentCharacter } = useContext(CharacterContext);
   const navigate = useNavigate();
 
@@ -21,12 +21,13 @@ const CharacterCards = ({ gender }) => {
 
 
   return (
-    <div className="w-full mx-auto">
+    <div className="">
         {/* <span className="text-md mm:text-lg sm:text-xl lg:text-4xl xl:text-5xl font-bold text-[#FF6FCF] mb-6">Explore Unique </span>
         <span className="text-md mm:text-lg sm:text-xl lg:text-4xl xl:text-5xl font-bold text-white mb-6">AI Characters</span> */}
-        <div className="object-scale-down px-6 mx-auto grid lg:grid-cols-4 md:grid-cols-3 grid-cols-2 gap-8">
+        <div className="object-scale-down grid lg:grid-cols-4 md:grid-cols-3 grid-cols-2">
         {characters
           .filter(character => character.gender === gender) // Filter by gender
+          .filter(character => character.type === type)
           .map((character, index) => (
             <Card 
               key={index} 

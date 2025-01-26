@@ -3,6 +3,7 @@ import Conversation from "./Conversation";
 import { AuthContext } from "../api/AuthContext";
 import { ConversationContext } from "../api/ConversationContext";
 import { deleteConversation } from '../api/apiService'
+import { Chat } from "./TopBar";
 
 const ConversationList = ({ item }) => {
     const { token } = useContext(AuthContext);
@@ -13,6 +14,7 @@ const ConversationList = ({ item }) => {
         setCurrentMessages,
         createNewConversation,
         setConversationList,
+        setActiveView,
     } = useContext(ConversationContext);
 
     const [searchTerm, setSearchTerm] = useState(""); // State for search term
@@ -24,6 +26,7 @@ const ConversationList = ({ item }) => {
             setCurrentConversation(conversationList[0]);
             setCurrentMessages(conversationList[0].messages);
         }
+
     }, [filteredConversations, setCurrentConversation, setCurrentMessages]);
 
     // Update filtered conversations based on search term
@@ -77,9 +80,9 @@ const ConversationList = ({ item }) => {
     };
 
     return (
-        <div className="flex flex-col p-4 items-center justify-between">
+        <div className="flex flex-col p-4 items-center justify-start">
             {/* Search Form */}
-            <div className="flex gap-2 items-center justify-between">
+            <div className="flex gap-2 items-center justify-between ">
                 <div className="flex">
                     <form
                         className="form relative"
@@ -141,7 +144,7 @@ const ConversationList = ({ item }) => {
             </div>
 
             {/* Item List */}
-            <div className="flex flex-col items-center justify-center gap-4 mt-4 p-2">
+            <div className="flex flex-col items-center justify-center gap-4 mt-4 p-2 overflow-y-auto scrollbar">
                 {filteredConversations.map((conversation) => (
                     <Conversation
                         key={conversation.id}

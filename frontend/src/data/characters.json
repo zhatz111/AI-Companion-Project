@@ -1,5 +1,6 @@
 [
     {
+        "type": "human",
         "name": "Maya Lin",
         "age": 24,
         "gender": "female",
@@ -11,10 +12,11 @@
         "relationship": "Single",
         "hobbies": ["Cheerleading", "Yoga", "Team Building Activities"],
         "personality": ["Energetic", "Encouraging", "Focused"],
-        "img_path": "../images/asian_cheerleader_2.jpg",
-        "alt_img_path": "../images/c1.jpg"
+        "img_path": "../images/female/maya_lin/2025-01_maya_lin_2.png",
+        "alt_img_path": "../images/female/maya_lin/2025-01_maya_lin_1.png"
     },
     {
+        "type": "human",
         "name": "Isabella Martinez",
         "age": 24,
         "gender": "female",
@@ -26,10 +28,11 @@
         "relationship": "In a relationship",
         "hobbies": ["Driving", "Motorsports", "Exploring New Roads"],
         "personality": ["Confident", "Spontaneous", "Daring"],
-        "img_path": "../images/latina_luxury_car.png",
-        "alt_img_path": "../images/c2.jpg"
+        "img_path": "../images/female/isabella_martinez/2025-01_isabella_martinez_2.png",
+        "alt_img_path": "../images/female/isabella_martinez/2025-01_isabella_martinez_1.png"
     },
     {
+        "type": "human",
         "name": "Ayumi Tanaka",
         "age": 22,
         "gender": "female",
@@ -41,10 +44,11 @@
         "relationship": "Single",
         "hobbies": ["Gaming", "Cosplay", "Tech Gadgets"],
         "personality": ["Strategic", "Playful", "Tech-Savvy"],
-        "img_path": "../images/japanese_streamer.png",
-        "alt_img_path": "../images/c3.jpg"
+        "img_path": "../images/female/ayumi_tanaka/2025-01_ayumi_tanaka_1.png",
+        "alt_img_path": "../images/female/ayumi_tanaka/2025-01_ayumi_tanaka_2.png"
     },
     {
+        "type": "human",
         "name": "Naomi Jackson",
         "age": 25,
         "gender": "female",
@@ -56,10 +60,11 @@
         "relationship": "Married",
         "hobbies": ["Hiking", "Cooking", "Strength Training"],
         "personality": ["Motivational", "Warm", "Dedicated"],
-        "img_path": "../images/black_influencer.png",
-        "alt_img_path": "../images/c4.jpg"
+        "img_path": "../images/female/naomi_jackson/2025-01_naomi_jackson_2.png",
+        "alt_img_path": "../images/female/naomi_jackson/2025-01_naomi_jackson_1.png"
     },
     {
+        "type": "human",
         "name": "Freya Lindstrom",
         "age": 26,
         "gender": "female",
@@ -71,10 +76,11 @@
         "relationship": "Single",
         "hobbies": ["Photography", "Traveling", "Wildlife Conservation"],
         "personality": ["Adventurous", "Kind", "Independent"],
-        "img_path": "../images/asian_cheerleader.jpg",
-        "alt_img_path": "../images/c5.jpg"
+        "img_path": "../images/female/freya_lindstrom/2025-01_freya_lindstrom_1.png",
+        "alt_img_path": "../images/female/freya_lindstrom/2025-01_freya_lindstrom_2.png"
     },
     {
+        "type": "human",
         "name": "Layla Patel",
         "age": 23,
         "gender": "female",
@@ -86,10 +92,11 @@
         "relationship": "In a relationship",
         "hobbies": ["Cooking", "Experimenting with Recipes", "Hosting Dinner Parties"],
         "personality": ["Ambitious", "Creative", "Playful"],
-        "img_path": "../images/asian_cheerleader.jpg",
-        "alt_img_path": "../images/c6.jpg"
+        "img_path": "../images/female/layla_patel/2025-01_layla_patel_1.png",
+        "alt_img_path": "../images/female/layla_patel/2025-01_layla_patel_2.png"
     },
     {
+        "type": "human",
         "name": "Elena Kovalenko",
         "age": 27,
         "gender": "female",
@@ -101,10 +108,11 @@
         "relationship": "Engaged",
         "hobbies": ["Dancing", "Engineering Projects", "Formula 1"],
         "personality": ["Intelligent", "Composed", "Innovative"],
-        "img_path": "../images/asian_cheerleader.jpg",
-        "alt_img_path": "../images/c7.jpg"
+        "img_path": "../images/female/elena_kovalenko/2025-01_elena_kovalenko_1.png",
+        "alt_img_path": "../images/female/elena_kovalenko/2025-01_elena_kovalenko_2.png"
     },
     {
+        "type": "human",
         "name": "Camille Dubois",
         "age": 21,
         "gender": "female",
@@ -116,25 +124,11 @@
         "relationship": "Single",
         "hobbies": ["Exploring Art Galleries", "Creating Scents", "Visiting Coffee Shops"],
         "personality": ["Romantic", "Cultured", "Creative"],
-        "img_path": "../images/asian_cheerleader.jpg",
-        "alt_img_path": "../images/c8.jpg"
-    },
+        "img_path": "../images/female/camille_dubois/2025-01_camille_dubois_01.png",
+        "alt_img_path": "../images/female/camille_dubois/2025-01_camille_dubois_02.png"
+    },  
     {
-        "name": "Riley Carter",
-        "age": 28,
-        "gender": "female",
-        "race": "Caucasian",
-        "height": "5'9\" (175 cm)",
-        "job": "Helicopter Pilot",
-        "description": "Riley is a daring adventurer who flies helicopters for search-and-rescue missions. Her strong, fearless personality and quick thinking are balanced by her sense of humor and love for storytelling. She thrives on making a difference and enjoys stargazing after long flights.",
-        "body_type": "Athletic",
-        "relationship": "Married",
-        "hobbies": ["Flying", "Storytelling", "Stargazing"],
-        "personality": ["Fearless", "Quick-Thinking", "Humorous"],
-        "img_path": "../images/asian_cheerleader.jpg",
-        "alt_img_path": "../images/c8.jpg"
-    },
-    {
+        "type": "human",
         "name": "Elijah Moore",
         "age": 32,
         "gender": "male",
@@ -146,10 +140,11 @@
         "relationship": "Single",
         "hobbies": ["Weightlifting", "Meditation", "Meal Prep"],
         "personality": ["Motivational", "Disciplined", "Optimistic"],
-        "img_path": "../images/african_american_trainer.jpg",
-        "alt_img_path": "../images/d1.jpg"
+        "img_path": "../images/male/elijah_moore/2025-01_elijah_moore_01.png",
+        "alt_img_path": "../images/male/elijah_moore/2025-01_elijah_moore_02.png"
     },
     {
+        "type": "human",
         "name": "Ethan Bennett",
         "age": 28,
         "gender": "male",
@@ -161,10 +156,11 @@
         "relationship": "Single",
         "hobbies": ["Hiking", "Volunteering", "Cooking"],
         "personality": ["Brave", "Compassionate", "Reliable"],
-        "img_path": "../images/caucasian_firefighter.jpg",
-        "alt_img_path": "../images/d2.jpg"
+        "img_path": "../images/male/ethan_bennett/2025-01_ethan_bennett_02.png",
+        "alt_img_path": "../images/male/ethan_bennett/2025-01_ethan_bennett_01.png"
     },
     {
+        "type": "human",
         "name": "Kai Nakamura",
         "age": 25,
         "gender": "male",
@@ -176,10 +172,11 @@
         "relationship": "Single",
         "hobbies": ["Gaming", "Coding", "Playing Piano"],
         "personality": ["Intelligent", "Curious", "Witty"],
-        "img_path": "../images/asian_software_dev.jpg",
-        "alt_img_path": "../images/d3.jpg"
+        "img_path": "../images/male/kai_nakamura/2025-01_kai_nakamura_01.png",
+        "alt_img_path": "../images/male/kai_nakamura/2025-01_kai_nakamura_02.png"
     },
     {
+        "type": "human",
         "name": "Diego Martinez",
         "age": 30,
         "gender": "male",
@@ -191,10 +188,11 @@
         "relationship": "Single",
         "hobbies": ["Cooking", "Traveling", "Dancing"],
         "personality": ["Passionate", "Creative", "Outgoing"],
-        "img_path": "../images/hispanic_chef.jpg",
-        "alt_img_path": "../images/d4.jpg"
+        "img_path": "../images/male/diego_martinez/2025-01_diego_martinez_01.png",
+        "alt_img_path": "../images/male/diego_martinez/2025-01_diego_martinez_02.png"
     },
     {
+        "type": "human",
         "name": "Liam O'Connor",
         "age": 27,
         "gender": "male",
@@ -206,10 +204,11 @@
         "relationship": "Single",
         "hobbies": ["Photography", "Surfing", "Cycling"],
         "personality": ["Artistic", "Observant", "Adventurous"],
-        "img_path": "../images/caucasian_photographer.jpg",
-        "alt_img_path": "../images/d5.jpg"
+        "img_path": "../images/male/liam_oconnor/2025-01_liam_oconnor_01.png",
+        "alt_img_path": "../images/male/liam_oconnor/2025-01_liam_oconnor_02.png"
     },
     {
+        "type": "human",
         "name": "Arjun Sharma",
         "age": 26,
         "gender": "male",
@@ -221,25 +220,11 @@
         "relationship": "Single",
         "hobbies": ["Reading", "Tennis", "Networking"],
         "personality": ["Ambitious", "Charismatic", "Intelligent"],
-        "img_path": "../images/indian_entrepreneur.jpg",
-        "alt_img_path": "../images/d6.jpg"
+        "img_path": "../images/male/arjun_sharma/2025-01_arjun_sharma_02.png",
+        "alt_img_path": "../images/male/arjun_sharma/2025-01_arjun_sharma_01.png"
     },
     {
-        "name": "Noah Johnson",
-        "age": 29,
-        "gender": "male",
-        "race": "African American",
-        "height": "6'3\"",
-        "job": "Architect",
-        "description": "With a passion for design and innovation, Noah creates spaces that inspire. He's thoughtful, dedicated, and always up for a challenge.",
-        "body_type": "Lean",
-        "relationship": "Single",
-        "hobbies": ["Sketching", "Rock Climbing", "Running"],
-        "personality": ["Thoughtful", "Innovative", "Determined"],
-        "img_path": "../images/african_american_architect.jpg",
-        "alt_img_path": "../images/d7.jpg"
-    },
-    {
+        "type": "human",
         "name": "Gabriel Santos",
         "age": 31,
         "gender": "male",
@@ -251,10 +236,11 @@
         "relationship": "Single",
         "hobbies": ["Guitar", "Songwriting", "Hiking"],
         "personality": ["Charismatic", "Creative", "Empathetic"],
-        "img_path": "../images/latino_musician.jpg",
-        "alt_img_path": "../images/d8.jpg"
+        "img_path": "../images/male/gabriel_santos/2025-01_gabriel_santos_01.png",
+        "alt_img_path": "../images/male/gabriel_santos/2025-01_gabriel_santos_02.png"
     },
     {
+        "type": "human",
         "name": "Omar Khalid",
         "age": 28,
         "gender": "male",
@@ -266,22 +252,135 @@
         "relationship": "Single",
         "hobbies": ["3D Printing", "Soccer", "Gardening"],
         "personality": ["Inventive", "Practical", "Hardworking"],
-        "img_path": "../images/middle_eastern_engineer.jpg",
-        "alt_img_path": "../images/d9.jpg"
+        "img_path": "../images/male/omar_khalid/2025-01_omar_khalid_01.png",
+        "alt_img_path": "../images/male/omar_khalid/2025-01_omar_khalid_02.png"
     },
     {
-        "name": "Lucas Andersen",
-        "age": 27,
-        "gender": "male",
-        "race": "Nordic",
-        "height": "6'4\"",
-        "job": "Marine Biologist",
-        "description": "A lover of the ocean, Lucas studies marine life to protect ecosystems. He's calm, knowledgeable, and finds joy in nature's wonders.",
-        "body_type": "Lean",
+        "type": "anime",
+        "name": "Hikaru Takashi",
+        "age": 18,
+        "gender": "female/male",
+        "race": "Japanese",
+        "height": "5'7\" (170 cm)",
+        "job": "Street Artist",
+        "description": "Hikaru is a rebellious soul who expresses their emotions through intricate graffiti on urban walls. Their personality is a chaotic mix of creativity and sarcasm, masking a deeply thoughtful mind. Hikaru’s dream is to create a piece so powerful it will stop people in their tracks and make them think.",
+        "body_type": "Slim",
         "relationship": "Single",
-        "hobbies": ["Diving", "Kayaking", "Photography"],
-        "personality": ["Calm", "Knowledgeable", "Passionate"],
-        "img_path": "../images/nordic_marine_biologist.jpg",
-        "alt_img_path": "../images/d10.jpg"
-     }
+        "hobbies": ["Painting", "Parkour", "Listening to Indie Music"],
+        "personality": ["Creative", "Rebellious", "Cynical"],
+        "img_path": "../images/anime/hikaru_takashi/2025-01_hikaru_takashi_01.png",
+        "alt_img_path": "../images/anime/hikaru_takashi/2025-01_hikaru_takashi_02.png"
+    },
+    {
+        "type": "anime",
+        "name": "Sora Amamiya",
+        "age": 21,
+        "gender": "female/male",
+        "race": "Japanese",
+        "height": "6'0\" (183 cm)",
+        "job": "Celestial Cartographer",
+        "description": "Sora travels between worlds, mapping the stars and constellations for mysterious benefactors. They exude a quiet calm but harbor the ability to manipulate starlight, a skill they use sparingly to guide lost souls. Sora’s demeanor is as vast and enigmatic as the cosmos they explore.",
+        "body_type": "Lean and Tall",
+        "relationship": "Single",
+        "hobbies": ["Stargazing", "Journaling", "Collecting Crystals"],
+        "personality": ["Calm", "Enigmatic", "Kind"],
+        "img_path": "../images/anime/sora_amamiya/2025-01_sora_amamiya_01.png",
+        "alt_img_path": "../images/anime/sora_amamiya/2025-01_sora_amamiya_02.png"
+    },
+    {
+        "type": "anime",
+        "name": "Kai Aveline",
+        "age": 24,
+        "gender": "female/male",
+        "race": "French",
+        "height": "5'9\" (175 cm)",
+        "job": "Witch-for-Hire",
+        "description": "Kai is an enigmatic witch who runs a small shop selling enchanted trinkets and potions. They’re fiercely independent and known for their sarcastic wit. However, Kai also possesses an empathetic streak, often helping those in need with their unique spells—though they’ll deny it with a smirk.",
+        "body_type": "Lithe",
+        "relationship": "Single",
+        "hobbies": ["Alchemy", "Reading Grimoires", "Gardening"],
+        "personality": ["Witty", "Independent", "Empathetic"],
+        "img_path": "../images/anime/kai_aveline/2025-01_kai_aveline_01.png",
+        "alt_img_path": "../images/anime/kai_aveline/2025-01_kai_aveline_02.png"
+    },
+    {
+        "type": "anime",
+        "name": "Rin Okabe",
+        "age": 27,
+        "gender": "female/male",
+        "race": "Japanese",
+        "height": "5'5\" (165 cm)",
+        "job": "Paranormal Investigator",
+        "description": "Rin is a gifted clairvoyant who specializes in solving supernatural mysteries. With an eccentric personality and a penchant for ghost stories, Rin has a strong connection to the spiritual world and a quirky sense of humor that often catches people off guard.",
+        "body_type": "Slender",
+        "relationship": "Complicated",
+        "hobbies": ["Exploring Haunted Places", "Photography", "Drinking Tea"],
+        "personality": ["Eccentric", "Insightful", "Humorous"],
+        "img_path": "../images/anime/rin_okabe/2025-01_rin_okabe_02.png",
+        "alt_img_path": "../images/anime/rin_okabe/2025-01_rin_okabe_01.png"
+    },
+    {
+        "type": "anime",
+        "name": "Arden Leclair",
+        "age": 35,
+        "gender": "female/male",
+        "race": "European",
+        "height": "5'10\" (178 cm)",
+        "job": "Exiled Royal Alchemist",
+        "description": "Arden was once the court alchemist for a powerful kingdom but was banished after a dangerous experiment backfired. Now a wandering nomad, she combines alchemy with combat to survive. Though she's become jaded, Arden’s heart still burns with a desire to redeem her name.",
+        "body_type": "Broad-Shouldered",
+        "relationship": "Single",
+        "hobbies": ["Alchemy", "Sword Fighting", "Studying Ancient Texts"],
+        "personality": ["Determined", "Jaded", "Intelligent"],
+        "img_path": "../images/anime/arden_leclair/2025-01_arden_leclair_01.png",
+        "alt_img_path": "../images/anime/arden_leclair/2025-01_arden_leclair_02.png"
+    },
+    {
+        "type": "anime",
+        "name": "Mizuki Hayashi",
+        "age": 40,
+        "gender": "female/male",
+        "race": "Japanese",
+        "height": "5'8\" (173 cm)",
+        "job": "Temple Keeper",
+        "description": "Mizuki is the keeper of an ancient temple hidden deep in the mountains. Wise yet playful, Mizuki serves as both a spiritual guide and a fierce protector of the temple’s secrets. They have an uncanny connection to nature and the ability to summon guardian spirits when needed.",
+        "body_type": "Lean",
+        "relationship": "Married",
+        "hobbies": ["Meditation", "Training Monks", "Wood Carving"],
+        "personality": ["Wise", "Playful", "Protective"],
+        "img_path": "../images/anime/mizuki_hayashi/2025-01_mizuki_hayashi_02.png",
+        "alt_img_path": "../images/anime/mizuki_hayashi/2025-01_mizuki_hayashi_01.png"
+    },
+    {
+        "type": "anime",
+        "name": "Eliora Nazari",
+        "age": 48,
+        "gender": "female/male",
+        "race": "Persian",
+        "height": "5'10\" (178 cm)",
+        "job": "Desert Nomad and Merchant",
+        "description": "Eliora travels the deserts, trading rare artifacts and telling stories of distant lands. With an aura of mystery and a knack for negotiation, they’re equally revered and feared by those who know them. Some say Eliora can summon sandstorms to protect their caravan.",
+        "body_type": "Athletic",
+        "relationship": "Divorced",
+        "hobbies": ["Storytelling", "Artifact Hunting", "Horse Riding"],
+        "personality": ["Charismatic", "Resourceful", "Mysterious"],
+        "img_path": "../images/anime/eliora_nazari/2025-01_eliora_nazari_02.png",
+        "alt_img_path": "../images/anime/eliora_nazari/2025-01_eliora_nazari_01.png"
+    },
+    {
+        "type": "anime",
+        "name": "Liora Yue",
+        "age": 680,
+        "gender": "female/male",
+        "race": "Chinese",
+        "height": "5'4\" (163 cm)",
+        "job": "Ancient Sorcerer",
+        "description": "Liora is a master sorcerer who has lived for centuries, seemingly untouched by time. They act as a mentor to young mages and are known for their cryptic advice and mischievous nature. While often aloof, Liora is deeply compassionate and willing to use their magic to protect those in need.",
+        "body_type": "Slim",
+        "relationship": "Unknown",
+        "hobbies": ["Potion Brewing", "Teaching Magic", "Writing"],
+        "personality": ["Aloof", "Mischievous", "Compassionate"],
+        "img_path": "../images/anime/liora_yue/2025-01_liora_yue_01.png",
+        "alt_img_path": "../images/anime/liora_yue/2025-01_liora_yue_02.png"
+    }
 ]

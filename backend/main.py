@@ -69,6 +69,7 @@ app = FastAPI()
 
 origins = [
     "http://localhost:3000",
+    "http://localhost:3001",
     "http://192.168.1.169:3000",
     "https://www.sweetaura.ai"
 ]
@@ -87,7 +88,6 @@ app.add_middleware(
 
 @app.post("/api/register", response_model=Token)
 async def register(user: User):
-    print(user)
     if users_collection.find_one({"email": user.email}):
         raise HTTPException(status_code=400, detail="Email already registered")
 
@@ -107,8 +107,6 @@ async def register(user: User):
     new_user["signed_up"] = datetime.now(timezone.utc)
     new_user["last_login"] = datetime.now(timezone.utc)
     new_user["confirmed_email"] = False
-
-    print(new_user)
 
     users_collection.insert_one(new_user)
     access_token = create_access_token(data={"sub": user.email})  # Use email in token
@@ -190,7 +188,7 @@ async def get_user_data(current_user: UserInDB = Depends(get_current_user)):
     Fetch the current user's data.
     """
     user_data = users_collection.find_one({"email": current_user.email})
-    print(current_user.email)
+
     if not user_data:
         raise HTTPException(status_code=404, detail="User not found")
     user_data["hashed_password"] = ""
@@ -209,7 +207,6 @@ async def create_conversation(
         "ai_character": ai_character,
         "created_at": datetime.now(timezone.utc),
     }
-    print(conversation)
     result = conversations_collection.insert_one(dict(conversation))
     conversation["id"] = str(result.inserted_id)
     return Conversation(**conversation)
@@ -333,7 +330,6 @@ async def generate_response(
             for message in content
         ]  # "content": {"type": "text", "text": message["content"]}
         message_list = system_prompt + extracted_messages
-        print(message_list)
 
         completion = open_AI_client.chat.completions.create(
             model="NousResearch/Nous-Hermes-2-Mixtral-8x7B-DPO",  # "mistralai/Mistral-Nemo-Instruct-2407", "mistralai/Mixtral-8x7B-Instruct-v0.1-fast"
@@ -345,7 +341,6 @@ async def generate_response(
 
         # Parse the response JSON
         response_dict = completion.to_dict()
-        print(response_dict)
 
         # Create the AI-generated message
         ai_message = {
@@ -363,7 +358,6 @@ async def generate_response(
 
     except Exception as e:
         # Handle potential errors
-        print(traceback.format_exc())
         raise HTTPException(
             status_code=500, detail=f"Error generating response: {str(e)}"
         ) from e
@@ -748,18 +742,15 @@ async def delete_chats(user: UserInDB = Depends(get_current_user)):
 @app.delete("/api/delete-account")
 async def delete_account(user: UserInDB = Depends(get_current_user)):
 
-    print(user)
     try:
         # Check if the user has any conversations
         conversations = list(conversations_collection.find({"email": user.email}))
-        print(conversations)
 
         if conversations:
             # Extract conversation IDs to delete associated messages and conversations
             conversations_ids = [
                 str(conversation["_id"]) for conversation in conversations
             ]
-            print(conversations_ids)
             # Perform all delete operations in one go for efficiency
             delete_messages_result = messages_collection.delete_many(
                 {"conversation_id": {"$in": conversations_ids}}

@@ -1,0 +1,8 @@
+website: Seaart.ai
+model: Diverse Male v1.0
+image settings: 2x3
+quantity: 3
+sampling method: DPM++2M Karras
+sampling steps: 20
+CFG Scale: 7.0
+fixed seed: 1056710410

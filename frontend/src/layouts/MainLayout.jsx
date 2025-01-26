@@ -71,6 +71,7 @@ const MainLayout = ({ children }) => {
                     setAuthVisible(true);  // Show AuthScreen
                     setIsLoginVisible(false);  // Make sure CreateAccount is visible
                 }}
+                onSettingsClick={() => setIsSettingsVisible(true)}
             />
 
             {isAuthVisible && (
@@ -91,7 +92,7 @@ const MainLayout = ({ children }) => {
                 setIsLoginVisible(true);  // Make sure Login is visible initially
             }} toggleSidebar={() => setOpen(!isOpen)} onSettingsClick={() => setIsSettingsVisible(true)}/> */}
                 {/* Top Bar Selector */}
-            <div className='flex mt-40 2xl:mt-16 2xl:ml-32 flex-col w-full'>
+            <div className='flex mt-40 2xl:mt-20 2xl:ml-28 mb-6 flex-col w-full'>
                 {/* <div className='flex mt-16'>
                     <ChatTopBar />
                 </div> */}
