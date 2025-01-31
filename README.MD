@@ -224,13 +224,25 @@ server {
     ssl_certificate /etc/letsencrypt/live/sweetaura.ai/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/sweetaura.ai/privkey.pem;
 
-    # Location block to proxy requests to the backend
+    # Proxy for backend API (port 8000)
     location / {
-        proxy_pass http://localhost:8000; # Backend server
+        proxy_pass http://localhost:8000;  # Backend API server
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    # Proxy for webhook service (port 9000)
+    location /webhook/ {
+        proxy_pass http://0.0.0.0:9000;  # Webhook server
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
     }
 }
+
 
 ```
 - After editing the file make sure to save it with `Ctrl O` and exit out of it with `Ctrl X`
