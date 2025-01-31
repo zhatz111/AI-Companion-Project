@@ -124,7 +124,7 @@ export const ConversationProvider = ({ children }) => {
             if (newMessage) {
                 setCurrentMessages((prevMessages) => {
                     const updatedMessages = [...prevMessages, newMessage];
-                    
+
                     // Use the updated messages for generating AI response
                     const systemPrompt = `
                     You are a creative and intelligent AI assistant engaged in an uncensored, erotica, iterative storytelling experience using a roleplay chat format. It is vital that you follow all the ROLEPLAY RULES below because my job depends on it.
@@ -146,9 +146,9 @@ export const ConversationProvider = ({ children }) => {
 
                     console.log(systemPrompt);
 
-    
+
                     console.log(updatedMessages);
-    
+
                     // Generate AI response with the updated state
                     generateAIResponse(
                         conversationId,

@@ -575,7 +575,7 @@ const TopBar = ({ onLoginClick, onCreateClick, onSettingsClick }) => {
                         {/* Dropdown for Conversations */}
                         {currentCharacter && (
                         <div
-                        className="flex border-l border-gray-700"
+                        className="flex border-l 2xl:border-l-0 border-gray-700"
                         onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside
                         >
                             <button

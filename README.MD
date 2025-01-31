@@ -113,7 +113,7 @@ EXPOSE 8000
 ## Deploying FastAPI Backend on AWS EC2 instance
 
 ### Creating and Setting up an EC2 instance
-- Create an instance in AWS EC2. Preference is `Amazon Linux 2023` (free tier eligable) with `t2.micro` (free tier eligable).
+- Create an instance in AWS EC2. Preference is `Amazon Linux 2023` (free tier eligible) with `t2.micro` (free tier eligible).
 - Connect to the instance using either EC2 instance connect or SSH. Prefer to use SSH. SSH command for terminal: (Ensure you are in the directory where your key pair exists)
 ```bash
 ssh -i "sweetaura_key_pair.pem" ec2-user@ec2-18-117-93-45.us-east-2.compute.amazonaws.com
@@ -182,12 +182,15 @@ sudo yum install certbot python3-certbot-nginx -y
 # Deactivate the venv
 deactivate
 
-# To obtain a wildcard SSL certificate use the DNS plugin for Spaceship
+# To obtain a wildcard SSL certificate use the DNS plugin for AWS Route53
 sudo yum install python3-certbot-dns-route53 -y
 
+
+
 # Use Certbot to obtain and configure the SSL certificate, this requires you to have a domain name already:
-sudo AWS_ACCESS_KEY_ID=your_access_key  AWS_SECRET_ACCESS_KEY=your_secret_key  certbot certonly     --authenticator dns-route53     -d "*.sweetaura.ai" -d
-"sweetaura.ai"
+sudo AWS_ACCESS_KEY_ID=your_access_key AWS_SECRET_ACCESS_KEY=your_secret_key certbot certonly \
+    --authenticator dns-route53 \
+    -d "*.sweetaura.ai" -d "sweetaura.ai"
 
 ```
 - After certbot runs correctly the result should have the following information:
@@ -261,14 +264,27 @@ bind = "0.0.0.0:8000"
 workers = 4  # Number of worker processes
 worker_class = "uvicorn.workers.UvicornWorker"
 loglevel = "info"
-accesslog = "/var/log/gunicorn_access.log"  # Path to access log, if error from this you can remove it
-errorlog = "/var/log/gunicorn_error.log"    # Path to error log, if error from this you can remove it
+accesslog = "logs/gunicorn_access.log"  # Path to access log, if error from this you can remove it
+errorlog = "logs/gunicorn_error.log"    # Path to error log, if error from this you can remove it
 timeout = 120  # Timeout in seconds
+
+# create logs folder and files, ensure you are in backend folder
+mkdir logs
+touch logs/gunicorn_access.log
+touch logs/gunicorn_error.log
+
+# make logs folder read/writable to all
+sudo chmod 777 logs
 
 # Start the server
 gunicorn main:app -c gunicorn.conf.py
 ```
 - Use systemd to make sure the server is restarted if it ever goes down
+```bash
+# Create a service file and add the information below
+sudo nano /etc/systemd/system/fastapi.service
+```
+
 ```ini
 [Unit]
 Description=FastAPI with Gunicorn
@@ -276,8 +292,8 @@ After=network.target
 
 [Service]
 User=ec2-user
-WorkingDirectory=/home/ec2-user/backend
-ExecStart=/home/ec2-user/backend/venv/bin/gunicorn main:app -c gunicorn.conf.py
+WorkingDirectory=/home/ec2-user/AI-Companion-Project/backend/
+ExecStart=/home/ec2-user/AI-Companion-Project/.venv/bin/gunicorn main:app -c /home/ec2-user/AI-Companion-Project/backend/gunicorn.conf.py
 Restart=always
 
 [Install]
@@ -285,9 +301,6 @@ WantedBy=multi-user.target
 ```
 - Useful commands to save the config, enable the service, and check for any errors
 ```bash
-# Save updated service file
-sudo nano /etc/systemd/system/fastapi.service
-
 # Reload the systemd config
 sudo systemctl daemon-reload
 
@@ -302,4 +315,208 @@ sudo systemctl status fastapi
 
 # Debug issues with logs for errors
 journalctl -u fastapi
+```
+
+## Deploying FastAPI Backend on AWS EC2 instance with ```uv``` and ```git```
+
+
+### The purpose of this is to make it easier to add required files using ```git``` and pull new changes to the backend. Also will be easier to manage python packages using ```uv```
+
+### Creating and Setting up an EC2 instance
+- Create an instance in AWS EC2. Preference is `Amazon Linux 2023` (free tier eligible) with `t2.micro` (free tier eligible).
+- Connect to the instance using either EC2 instance connect or SSH. Prefer to use SSH. SSH command for terminal: (Ensure you are in the directory where your key pair exists)
+```bash
+ssh -i "sweetaura_key_pair.pem" ec2-user@ec2-18-116-43-7.us-east-2.compute.amazonaws.com
+```
+- After connecting to your EC2 instance, it is necessary to update the system and install python 3.11 using the commands below:
+```bash
+# Update the system
+sudo yum update -y
+
+- install uv for python management
+```bash
+# doanload uv for the command line interface
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# install required python version
+uv python install 3.11
+```
+
+- need to setup ssh key to remote into git to clone the desired repository
+```bash
+# generate an shh private and public key
+ssh-keygen -t rsa -b 4096 -C sweetaura200@gmail.com
+
+# make the private key not publicly available
+chmod 600 ~/.ssh/id_rsa
+
+# start ssh-agent then run the ssh-add command
+eval `ssh-agent -s
+ssh-add -k ~/.ssh/id_rsa
+
+# view and copy the public key
+cat ~/.ssh/id_rsa.pub  # If you prefer appear on screen
+
+# move the public key into the authorized keys folder that should already be created
+cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
+```
+  - After going through the process of creating and adding an ssh key go to GitHub -> SSH keys -> New SSH key
+  - Add the SSH key you copied (this process will need to be done for every EC2 instance that is created)
+
+- clone the GitHub repository using SSH
+```bash
+# install git if not installed already
+sudo yum install git -y
+
+# clone the GitHub repo
+git clone git@github.com:zhatz111/AI-Companion-Project.git
+```
+
+### Setting up GitHub Webhooks to auto deploy backend after GitHub commit
+
+- Install and setup the latest version of ```Go```
+```bash
+# find the latest Linux version from "https://go.dev/dl/" and install it
+wget https://go.dev/dl/go1.23.5.linux-amd64.tar.gz
+
+# extract the tar file to the .local folder in main user directory
+sudo tar -C /usr/local -xzf go1.23.5.linux-amd64.tar.gz
+
+# setup the Go environment
+export GOROOT=/usr/local/go
+export GOPATH=$HOME/go
+export PATH=$GOROOT/bin:$GOPATH/bin:$PATH
+
+# apply updated path changes
+source ~/.bashrc
+
+# check Go installed correctly
+go version
+which go
+```
+
+- Install and setup WebHooks
+```bash
+# install webhooks latest version with go
+go install github.com/adnanh/webhook@latest
+
+# check that webhooks was installed
+cd go/bin/
+ls -la
+
+# Create webhooks directory structure
+mkdir ~/webhooks
+mkdir ~/webhooks/sweetaura-deployment
+touch ~/webhooks/hooks.json
+touch ~/webhooks/sweetaura-deployment/deploy.sh
+chmod +x ~/webhooks/sweetaura-deployment/deploy.sh
+```
+
+- Set up webhook files we created
+```bash
+# add configuration into hooks.json
+nano hooks.json
+[{
+    "id": "sweetaura-deployment",
+    "execute-command": "/root/webhooks/sweetaura-deployment/deploy.sh",
+    "command-working-directory": "/home/ec2-user/AI-Companion-Project",
+    "response-message": "Executing deploy script...",
+    # "trigger-rule": {
+    #     "match": {
+    #         "type": "payload-hash-sha1",
+    #         "secret": "The Returners",
+    #         "parameter": {
+    #             "source": "header",
+    #             "name": "X-Hub-Signature"
+    #         }
+    #     }
+    # }
+}]
+
+```
+- Setup the ```deploy.sh``` bash script to pull from git and rebuild backend using the system service for fastapi
+```bash
+#!/bin/bash
+
+# Enable error handling
+set -e
+
+# Define project directory
+PROJECT_DIR="/home/ec2-user/AI-Companion-Project"
+LOG_FILE="$PROJECT_DIR/deploy.log"
+
+# Log deployment start
+echo "Starting deployment: $(date)" >> $LOG_FILE
+
+# Navigate to the project directory
+cd $PROJECT_DIR
+
+# Pull latest changes from main
+echo "Pulling latest changes..." >> $LOG_FILE
+git fetch origin main
+git reset --hard origin/main
+
+# Activate virtual environment (adjust path if needed)
+echo "Activating virtual environment..." >> $LOG_FILE
+source venv/bin/activate
+
+# Install dependencies
+echo "Installing dependencies..." >> $LOG_FILE
+cd backend/
+uv pip install -r requirements.txt
+
+# Restart FastAPI application (adjust based on process manager)
+echo "Restarting FastAPI application..." >> $LOG_FILE
+sudo systemctl restart fastapi  # If using systemd
+
+# Log completion
+echo "Deployment finished: $(date)" >> $LOG_FILE
+```
+
+- to start the hooks webserver so that it listens for commits
+```bash
+# ensure you are in "ec2-user" folder and run:
+~/go/bin/webhook -hooks /home/ec2-user/webhooks/hooks.json -ip 0.0.0.0 -verbose
+```
+
+```bash
+sudo nano /etc/systemd/system/webhook.service
+```
+```ini
+[Unit]
+Description=GitHub Webhook Listener
+After=network.target
+
+[Service]
+ExecStart=/home/ec2-user/go/bin/webhook -hooks /home/ec2-user/webhooks/hooks.json -ip 0.0.0.0 -verbose
+WorkingDirectory=/home/ec2-user/webhooks
+Restart=always
+User=root
+
+[Install]
+WantedBy=multi-user.target
+```
+
+- Useful commands to save the config, enable the service, and check for any errors
+```bash
+# Reload the systemd config
+sudo systemctl daemon-reload
+
+# restart the service to apply changes
+sudo systemctl restart webhook
+
+# Enable the service to start on boot
+sudo systemctl enable webhook
+
+# Check the status of the service
+sudo systemctl status webhook
+
+# Debug issues with logs for errors
+journalctl -u webhook
+```
+
+### Steps to set up EC2 instance for FastAPI backend deployment and Reverse Proxy
+- transfer ```.env``` file to git repo on ec2 instance
+```bash
+scp -i "sweetaura_key_pair.pem" -r .env ec2-user@ec2-18-116-43-7.us-east-2.compute.amazonaws.com:~/AI-Companion-Project
 ```

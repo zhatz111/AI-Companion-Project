@@ -1,7 +1,6 @@
 # Standard Imports
 import secrets
 import hashlib
-import traceback
 from typing import Optional, List, Annotated
 from datetime import datetime, timedelta, timezone
 
@@ -63,6 +62,7 @@ from core.database import (
 
 # -----------------------------------------------------------------
 
+# test to ensure that the webhooks are working correctly
 
 # FASTAPI APP WITH ENDPOINTS
 app = FastAPI()

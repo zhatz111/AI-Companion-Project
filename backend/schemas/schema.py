@@ -16,6 +16,8 @@ class User(BaseModel):
     confirm_password: str
 
 class UserInDB(BaseModel):
+
+    # User account information
     username: str
     email: EmailStr
     hashed_password: str
@@ -23,6 +25,14 @@ class UserInDB(BaseModel):
     signed_up: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     last_login: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     confirmed_email: bool = False
+
+    # Points system for app
+    aura_points: int = 0
+    rizz_rating: int = 0
+    first_rating: bool = True
+    
+
+    # User data info from settings
     id: Optional[str] = None
     age: Optional[int] = None
     height_feet: Optional[int] = None
@@ -32,6 +42,8 @@ class UserInDB(BaseModel):
     identity: Optional[str] = None
     sexuality: Optional[str] = None
     politics: Optional[str] = None
+
+    # User Profile picture info
     filename: Optional[str] = None
     content_type: Optional[str] = None
     image_url: Optional[str] = None
