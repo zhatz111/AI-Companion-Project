@@ -234,8 +234,8 @@ server {
     }
 
     # Proxy for webhook service (port 9000)
-    location /sweetaura-deployment {
-        proxy_pass http://0.0.0.0:9000/hooks;  # Webhook server
+    location /hooks/ {
+        proxy_pass http://0.0.0.0:9000;  # Webhook server
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
