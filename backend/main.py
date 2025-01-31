@@ -62,7 +62,7 @@ from core.database import (
 
 # -----------------------------------------------------------------
 
-# test to ensure that the webhooks are working correctly
+# test again to ensure it all works automatically
 
 # FASTAPI APP WITH ENDPOINTS
 app = FastAPI()
