@@ -532,3 +532,5 @@ journalctl -u webhook
 ```bash
 scp -i "sweetaura_key_pair.pem" -r .env ec2-user@ec2-18-116-43-7.us-east-2.compute.amazonaws.com:~/AI-Companion-Project
 ```
+
+- Major update to record all issues with webhooks and there solutions
